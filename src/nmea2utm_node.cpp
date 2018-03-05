@@ -10,10 +10,11 @@ class NMEAPlayer
 {
 public:
 
-  NMEAPlayer () : first(true), log_file_path("gps_converted"), frame_id("helius")
+  NMEAPlayer () : first(true), log_file_path("gps_converted"), frame_id("odom"), child_frame_id("base_link")
   {
     ros::NodeHandle nodeLocal("~");
     frame_id = nodeLocal.param("frame_id", frame_id);
+    child_frame_id = nodeLocal.param("child_frame_id", child_frame_id);
     log_file_path = nodeLocal.param("log_file", log_file_path);
     std::cout << log_file_path << std::endl;
 
@@ -87,7 +88,7 @@ public:
   void publishPoint()
   {
     geometry_msgs::PointStamped ptStamped;
-    ptStamped.header.frame_id = frame_id+"_pt";
+    ptStamped.header.frame_id = frame_id;
     ptStamped.header.stamp = ros::Time::now();
     ptStamped.point.x = this->mUtmEast;
     ptStamped.point.y = this->mUtmNorth;
@@ -99,12 +100,12 @@ public:
   void publishPose()
   {
     geometry_msgs::PoseStamped poseStamped;
-    poseStamped.header.frame_id = frame_id+"_pose";
+    poseStamped.header.frame_id = frame_id;
     poseStamped.header.stamp = ros::Time::now();
     poseStamped.pose.position.x = this->mLong;
     poseStamped.pose.position.y = this->mLat;
     poseStamped.pose.position.z = this->mAlt;
-    // poseStamped.pose.orientation = ;
+//     poseStamped.pose.orientation = ;
 
     pose_pub.publish(poseStamped);
   }
@@ -173,6 +174,7 @@ public:
     {
         //Publish position
         this->publishPoint();
+
         //Publish pose
         this->publishPose();
         //Odom pose
@@ -191,13 +193,13 @@ private:
   double mTime, mUtmEast, mUtmNorth, mLat, mLong, mFixQuali, mNroSats, mDilut, mAlt, mGeoidH;
   std::string mLatH, mLongH, mAltU, mGeoidHU;
   bool first;
-  std::string log_file_path, frame_id;
+  std::string log_file_path, frame_id, child_frame_id;
   std::ifstream log_file;
 };
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "NMEA2UTM");
+  ros::init(argc, argv, "nmea2utm_node");
 
   NMEAPlayer mNMEAPlayer;
 
