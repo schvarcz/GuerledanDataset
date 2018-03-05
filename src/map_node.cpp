@@ -13,11 +13,11 @@ class MAPLoader
 {
 public:
 
-  MAPLoader () : log_file_path("map.pts"), frame_id("helius")
+  MAPLoader () : log_file_path("map.pts"), frame_id("map")
   {
-    minX = numeric_limits<double>::min(); maxX = numeric_limits<double>::max();
-    minY = numeric_limits<double>::min(); maxY = numeric_limits<double>::max();
-    minZ = numeric_limits<double>::min(); maxZ = numeric_limits<double>::max();
+    minX = -numeric_limits<double>::max(); maxX = numeric_limits<double>::max();
+    minY = -numeric_limits<double>::max(); maxY = numeric_limits<double>::max();
+    minZ = -numeric_limits<double>::max(); maxZ = numeric_limits<double>::max();
 
     ros::NodeHandle nodeLocal("~");
     frame_id = nodeLocal.param("frame_id", frame_id);
@@ -29,6 +29,12 @@ public:
     minZ = nodeLocal.param("minZ", minZ);
     maxZ = nodeLocal.param("maxZ", maxZ);
     std::cout << log_file_path << std::endl;
+    cout << "minX: " << minX << endl;
+    cout << "maxX: " << maxX << endl;
+    cout << "minY: " << minY << endl;
+    cout << "maxY: " << maxY << endl;
+    cout << "minZ: " << minZ << endl;
+    cout << "maxZ: " << maxZ << endl;
 
     std::string ns = ros::this_node::getNamespace();
 
@@ -52,12 +58,13 @@ public:
       getline(sline, zs, ' ');
       x = stod(xs);
       y = stod(ys);
-      z = -stod(zs);
+      z = stod(zs);
 
       if ((minX < x) && (x < maxX) &&
           (minY < y) && (y < maxY) &&
           (minZ < z) && (z < maxZ))
       {
+        cout << x << " - " << y << " - " << z << endl;
         point.x = x;
         point.y = y;
         point.z = z;
@@ -80,19 +87,19 @@ public:
       std::cout << current_time << std::endl;
 
       pc_msg.header.stamp = current_time;
-      pc_msg.header.frame_id = frame_id+"_pointcloud";
+      pc_msg.header.frame_id = frame_id;
       pc_pub.publish(pc_msg);
 
-      geometry_msgs::TransformStamped pc_trans;
-      pc_trans.header.stamp = current_time;
-      pc_trans.header.frame_id = frame_id;
-      pc_trans.child_frame_id = frame_id+"_pointcloud";
+//      geometry_msgs::TransformStamped pc_trans;
+//      pc_trans.header.stamp = current_time;
+//      pc_trans.header.frame_id = frame_id;
+//      pc_trans.child_frame_id = child_frame_id;
 
-      pc_trans.transform.translation.x = 0.0;
-      pc_trans.transform.translation.y = 0.0;
-      pc_trans.transform.translation.z = 0.0;
-      pc_trans.transform.rotation = tf::createQuaternionMsgFromYaw(0);
-      tf_broadcaster.sendTransform(pc_trans);
+//      pc_trans.transform.translation.x = 0.0;
+//      pc_trans.transform.translation.y = 0.0;
+//      pc_trans.transform.translation.z = 0.0;
+//      pc_trans.transform.rotation = tf::createQuaternionMsgFromYaw(0);
+//      tf_broadcaster.sendTransform(pc_trans);
       ros::spinOnce();
       r.sleep();
     }

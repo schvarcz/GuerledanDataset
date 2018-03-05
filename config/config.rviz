@@ -8,7 +8,9 @@ Panels:
         - /Status1
         - /PointStamped1
         - /PointCloud1
+        - /PointCloud1/Status1
         - /PointStamped2
+        - /PointStamped2/Status1
       Splitter Ratio: 0.5
     Tree Height: 728
   - Class: rviz/Selection
@@ -30,7 +32,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: PointCloud
 Visualization Manager:
   Class: ""
   Displays:
@@ -65,14 +67,14 @@ Visualization Manager:
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 10
-        Min Value: -10
+        Max Value: -83.5899963
+        Min Value: -123.099998
         Value: true
       Axis: Z
       Channel Name: intensity
       Class: rviz/PointCloud
       Color: 255; 255; 255
-      Color Transformer: ""
+      Color Transformer: AxisColor
       Decay Time: 0
       Enabled: true
       Invert Rainbow: false
@@ -81,12 +83,12 @@ Visualization Manager:
       Min Color: 0; 0; 0
       Min Intensity: 0
       Name: PointCloud
-      Position Transformer: ""
+      Position Transformer: XYZ
       Queue Size: 10
       Selectable: true
       Size (Pixels): 3
-      Size (m): 0.00999999978
-      Style: Flat Squares
+      Size (m): 1
+      Style: Spheres
       Topic: /point_cloud
       Unreliable: false
       Use Fixed Frame: true
@@ -127,25 +129,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 343.60437
+      Distance: 395.379303
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 253539
-        Y: 6805743
-        Z: 28.4330006
+        X: 253407.188
+        Y: 6805948
+        Z: -183.048447
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 1.56479633
+      Pitch: 0.404797465
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.955397904
+      Yaw: 1.36039758
     Saved: ~
 Window Geometry:
   Displays:
