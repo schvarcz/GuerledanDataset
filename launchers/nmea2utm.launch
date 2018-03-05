@@ -1,0 +1,6 @@
+<launch>
+    <node pkg="helius" type="nmea2utm_node" name="nmea2utm_node" output="screen">
+        <param name="log_file" value="/home/schvarcz/Dropbox/Doutorado-ENSTA/Guerledan/gps_converted" output="screen" />
+    </node>
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find helius)/config/config.rviz" />
+</launch>
