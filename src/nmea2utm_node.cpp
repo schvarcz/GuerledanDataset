@@ -173,10 +173,10 @@ public:
     {
         //Publish position
         this->publishPoint();
-//        //Publish pose
-//        this->publishPose();
-//        //Odom pose
-//        this->publishOdom();
+        //Publish pose
+        this->publishPose();
+        //Odom pose
+        this->publishOdom();
         ros::spinOnce();
         r.sleep();
     }

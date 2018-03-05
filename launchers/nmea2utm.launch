@@ -1,6 +1,14 @@
 <launch>
     <node pkg="helius" type="nmea2utm_node" name="nmea2utm_node" output="screen">
-        <param name="log_file" value="/home/schvarcz/Dropbox/Doutorado-ENSTA/Guerledan/gps_converted" output="screen" />
+        <param name="log_file" value="/home/schvarcz/Dropbox/Doutorado-ENSTA/Guerledan/gps_converted"/>
     </node>
     <node pkg="rviz" type="rviz" name="rviz" args="-d $(find helius)/config/config.rviz" />
+
+    <node pkg="helius" type="map_node" name="map_node" output="screen">
+    <param name="log_file" value="/home/schvarcz/Dropbox/Doutorado-ENSTA/Guerlédan_2013_06/MRIS_XYZ_Guerledan_Retenue_2013_06_L93_IGN69_1x1.pts"/>
+    <param name="minX" value="253150"/>
+    <param name="maxX" value="253600"/>
+    <param name="minY" value="6805440"/>
+    <param name="maxY" value="6805940"/>
+    </node>
 </launch>
