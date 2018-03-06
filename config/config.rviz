@@ -8,9 +8,10 @@ Panels:
         - /Status1
         - /PointStamped1
         - /PointCloud1
-        - /PointCloud1/Status1
         - /PointStamped2
-        - /PointStamped2/Status1
+        - /Odometry1
+        - /Odometry1/Shape1
+        - /Pose1
       Splitter Ratio: 0.5
     Tree Height: 728
   - Class: rviz/Selection
@@ -67,8 +68,8 @@ Visualization Manager:
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: -83.5899963
-        Min Value: -123.099998
+        Max Value: 123.099998
+        Min Value: 83.5899963
         Value: true
       Axis: Z
       Channel Name: intensity
@@ -88,7 +89,7 @@ Visualization Manager:
       Selectable: true
       Size (Pixels): 3
       Size (m): 1
-      Style: Spheres
+      Style: Flat Squares
       Topic: /point_cloud
       Unreliable: false
       Use Fixed Frame: true
@@ -102,6 +103,55 @@ Visualization Manager:
       Name: PointStamped
       Radius: 0.200000003
       Topic: /point
+      Unreliable: false
+      Value: true
+    - Angle Tolerance: 0.100000001
+      Class: rviz/Odometry
+      Covariance:
+        Orientation:
+          Alpha: 0.5
+          Color: 255; 255; 127
+          Color Style: Unique
+          Frame: Local
+          Offset: 1
+          Scale: 1
+          Value: true
+        Position:
+          Alpha: 0.300000012
+          Color: 204; 51; 204
+          Scale: 1
+          Value: true
+        Value: true
+      Enabled: true
+      Keep: 1000
+      Name: Odometry
+      Position Tolerance: 0.100000001
+      Shape:
+        Alpha: 1
+        Axes Length: 1
+        Axes Radius: 0.100000001
+        Color: 255; 25; 0
+        Head Length: 3
+        Head Radius: 1
+        Shaft Length: 10
+        Shaft Radius: 0.5
+        Value: Arrow
+      Topic: /odom
+      Unreliable: false
+      Value: true
+    - Alpha: 1
+      Axes Length: 1
+      Axes Radius: 0.100000001
+      Class: rviz/Pose
+      Color: 255; 25; 0
+      Enabled: true
+      Head Length: 3
+      Head Radius: 1
+      Name: Pose
+      Shaft Length: 10
+      Shaft Radius: 0.5
+      Shape: Arrow
+      Topic: /poseStamped
       Unreliable: false
       Value: true
   Enabled: true
@@ -129,25 +179,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 395.379303
+      Distance: 438.052734
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 253407.188
-        Y: 6805948
-        Z: -183.048447
+        X: 253390.188
+        Y: 6805693.5
+        Z: 99.9199371
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.404797465
+      Pitch: 1.56979632
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 1.36039758
+      Yaw: 6.04358196
     Saved: ~
 Window Geometry:
   Displays:

@@ -5,12 +5,20 @@
 #include <geometry_msgs/PointStamped.h>
 #include <tf/transform_broadcaster.h>
 #include <sstream>
+#include <math.h>
+class GpsPose
+{
+
+public:
+  double mTime, mUtmEast, mUtmNorth, mLat, mLong, mFixQuali, mNroSats, mDilut, mAlt, mGeoidH;
+  std::string mLatH, mLongH, mAltU, mGeoidHU;
+};
 
 class NMEAPlayer
 {
 public:
 
-  NMEAPlayer () : first(true), log_file_path("gps_converted"), frame_id("odom"), child_frame_id("base_link")
+  NMEAPlayer () : log_file_path("gps_converted"), frame_id("odom"), child_frame_id("base_link")
   {
     ros::NodeHandle nodeLocal("~");
     frame_id = nodeLocal.param("frame_id", frame_id);
@@ -29,7 +37,7 @@ public:
     std::getline(log_file, line);
   }
 
-  bool readLine()
+  bool readLine(GpsPose &gpsPose)
   {
     std::string line;
     bool EOFF = (std::getline(log_file, line)? true : false);
@@ -40,47 +48,48 @@ public:
     std::stringstream part(line);
     std::string time, utmEast, utmNorth, lat, latH, longg, longH, fixQuali, nroSats, dilut, alt, altU, geoidH, geoidHU;
 
+
     std::getline(part,time,',');
-    mTime = std::stod(time);
+    gpsPose.mTime = std::stod(time);
 
     std::getline(part,utmEast,',');
-    mUtmEast = std::stod(utmEast);
+    gpsPose.mUtmEast = std::stod(utmEast);
 
     std::getline(part,utmNorth,',');
-    mUtmNorth = std::stod(utmNorth);
+    gpsPose.mUtmNorth = std::stod(utmNorth);
 
     std::getline(part,lat,',');
-    mLat = std::stod(lat);
+    gpsPose.mLat = std::stod(lat);
 
     std::getline(part,latH,',');
-    mLatH = latH;
+    gpsPose.mLatH = latH;
 
     std::getline(part,longg,',');
-    mLong = std::stod(longg);
+    gpsPose.mLong = std::stod(longg);
 
     std::getline(part,longH,',');
-    mLongH = longH;
+    gpsPose.mLongH = longH;
 
     std::getline(part,fixQuali,',');
-    mFixQuali = std::stod(fixQuali);
+    gpsPose.mFixQuali = std::stod(fixQuali);
 
     std::getline(part,nroSats,',');
-    mNroSats = std::stod(nroSats);
+    gpsPose.mNroSats = std::stod(nroSats);
 
     std::getline(part,dilut,',');
-    mDilut = std::stod(dilut);
+    gpsPose.mDilut = std::stod(dilut);
 
     std::getline(part,alt,',');
-    mAlt = std::stod(alt);
+    gpsPose.mAlt = std::stod(alt);
 
     std::getline(part,altU,',');
-    mAltU = altU;
+    gpsPose.mAltU = altU;
 
     std::getline(part,geoidH,',');
-    mGeoidH = std::stod(geoidH);
+    gpsPose.mGeoidH = std::stod(geoidH);
 
     std::getline(part,geoidHU,',');
-    mGeoidHU = geoidHU;
+    gpsPose.mGeoidHU = geoidHU;
 
     return EOFF;
   }
@@ -90,9 +99,9 @@ public:
     geometry_msgs::PointStamped ptStamped;
     ptStamped.header.frame_id = frame_id;
     ptStamped.header.stamp = ros::Time::now();
-    ptStamped.point.x = this->mUtmEast;
-    ptStamped.point.y = this->mUtmNorth;
-    ptStamped.point.z = this->mAlt;
+    ptStamped.point.x = mCurGpsPose.mUtmEast;
+    ptStamped.point.y = mCurGpsPose.mUtmNorth;
+    ptStamped.point.z = 124.97; //mCurGpsPose.mAlt;
 
     point_pub.publish(ptStamped);
   }
@@ -102,85 +111,93 @@ public:
     geometry_msgs::PoseStamped poseStamped;
     poseStamped.header.frame_id = frame_id;
     poseStamped.header.stamp = ros::Time::now();
-    poseStamped.pose.position.x = this->mLong;
-    poseStamped.pose.position.y = this->mLat;
-    poseStamped.pose.position.z = this->mAlt;
-//     poseStamped.pose.orientation = ;
+    poseStamped.pose.position.x = mCurGpsPose.mUtmEast;
+    poseStamped.pose.position.y = mCurGpsPose.mUtmNorth;
+    poseStamped.pose.position.z = 124.97; //mCurGpsPose.mAlt;
+    poseStamped.pose.orientation = tf::createQuaternionMsgFromYaw(std::atan2(mNextGpsPose.mUtmNorth - mCurGpsPose.mUtmNorth, mNextGpsPose.mUtmEast - mCurGpsPose.mUtmEast));
 
     pose_pub.publish(poseStamped);
   }
 
   void publishOdom()
   {
-    //        double yaw = pose2d.theta;
+    ros::Time cur_time = ros::Time::now();
+    double x = mCurGpsPose.mUtmEast;
+    double y = mCurGpsPose.mUtmNorth;
+    double z = 124.97; //mCurGpsPose.mAlt;
 
-    //        double dt = (odom_msg.header.stamp - last_time).toSec();
-    //        double dx = odom_msg.twist.twist.linear.x*dt*cos(yaw);
-    //        double dy = odom_msg.twist.twist.linear.x*dt*sin(yaw);
+    double yaw = std::atan2(mNextGpsPose.mUtmNorth - mCurGpsPose.mUtmNorth, mNextGpsPose.mUtmEast - mCurGpsPose.mUtmEast);
+    double lastYaw = std::atan2(mCurGpsPose.mUtmNorth - mLastGpsPose.mUtmNorth, mCurGpsPose.mUtmEast - mLastGpsPose.mUtmEast);
 
-    //        x += dx;
-    //        y += dy;
-    //        double omega = yaw-lastYaw;
-    //        lastYaw = yaw;
-    //        omega = (omega >  M_PI) ? 2*M_PI - omega : omega;
-    //        omega = (omega < -M_PI) ? omega + 2*M_PI : omega;
-    //        omega /= dt;
 
-    //        //since all odometry is 6DOF we'll need a quaternion created from yaw
-    //        geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(yaw);
+    //since all odometry is 6DOF we'll need a quaternion created from yaw
+    geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(yaw);
 
-    //        //first, we'll publish the transform over tf
-    //        geometry_msgs::TransformStamped odom_trans;
-    //        odom_trans.header.stamp = odom_msg.header.stamp;
-    //        odom_trans.header.frame_id = "map";
-    //        odom_trans.child_frame_id = "odom";
+    double dt = (cur_time - last_time).toSec();
+    double dx = std::sqrt(std::pow(mCurGpsPose.mUtmEast - mLastGpsPose.mUtmEast,2) + std::pow(mCurGpsPose.mUtmNorth - mLastGpsPose.mUtmNorth,2))/dt;
+    double dy = 0;
 
-    //        odom_trans.transform.translation.x = x;
-    //        odom_trans.transform.translation.y = y;
-    //        odom_trans.transform.translation.z = 0.0;
-    //        odom_trans.transform.rotation = odom_quat;
+    double omega = yaw-lastYaw;
+    omega = (omega >  M_PI) ? 2*M_PI - omega : omega;
+    omega = (omega < -M_PI) ? omega + 2*M_PI : omega;
+    omega /= dt;
 
-    //        //send the transform
-    //        odom_broadcaster.sendTransform(odom_trans);
+    //first, we'll publish the transform over tf
+    geometry_msgs::TransformStamped odom_trans;
+    odom_trans.header.stamp = cur_time;
+    odom_trans.header.frame_id = frame_id;
+    odom_trans.child_frame_id = child_frame_id;
 
-    //        //next, we'll publish the odometry message over ROS
-    //        nav_msgs::Odometry odom;
-    //        odom.header.stamp = odom_msg.header.stamp;
-    //        odom.header.frame_id = "map";
+    odom_trans.transform.translation.x = x;
+    odom_trans.transform.translation.y = y;
+    odom_trans.transform.translation.z = z;
+    odom_trans.transform.rotation = odom_quat;
 
-    //        //set the position
-    //        odom.pose.pose.position.x = x;
-    //        odom.pose.pose.position.y = y;
-    //        odom.pose.pose.position.z = 0.0;
-    //        odom.pose.pose.orientation = odom_quat;
+    //send the transform
+    odom_broadcaster.sendTransform(odom_trans);
 
-    //        //set the velocity
-    //        odom.child_frame_id = "odom";
-    //        odom.twist.twist.linear.x = odom_msg.twist.twist.linear.x;
-    //        odom.twist.twist.linear.y = odom_msg.twist.twist.linear.y;
-    //        odom.twist.twist.angular.z = omega;
+    //next, we'll publish the odometry message over ROS
+    nav_msgs::Odometry odom;
+    odom.header.stamp = odom_trans.header.stamp;
+    odom.header.frame_id = frame_id;
+    odom.child_frame_id = child_frame_id;
 
-    //        //publish the message
-    //        odom_pub.publish(odom);
+    //set the position
+    odom.pose.pose.position.x = x;
+    odom.pose.pose.position.y = y;
+    odom.pose.pose.position.z = z;
+    odom.pose.pose.orientation = odom_quat;
 
-    //        last_time = odom_msg.header.stamp;
+    //set the velocity
+    odom.twist.twist.linear.x = dx;
+    odom.twist.twist.linear.y = dy;
+    odom.twist.twist.angular.z = omega;
+
+    //publish the message
+    odom_pub.publish(odom);
+
+    last_time = cur_time;
   }
 
   void run()
   {
     ros::Rate r(10);
     //Read a line
-    while(this->readLine())
+    this->readLine(mLastGpsPose);
+    this->readLine(mCurGpsPose);
+    while(this->readLine(mNextGpsPose))
     {
-        //Publish position
-        this->publishPoint();
+      //Publish position
+      this->publishPoint();
 
-        //Publish pose
-        this->publishPose();
-        //Odom pose
-        this->publishOdom();
-        ros::spinOnce();
-        r.sleep();
+      //Publish pose
+      this->publishPose();
+      //Odom pose
+      this->publishOdom();
+      ros::spinOnce();
+      r.sleep();
+      mLastGpsPose = mCurGpsPose;
+      mCurGpsPose = mNextGpsPose;
     }
   }
 
@@ -190,9 +207,7 @@ private:
   tf::TransformBroadcaster odom_broadcaster;
 
   ros::Time last_time;
-  double mTime, mUtmEast, mUtmNorth, mLat, mLong, mFixQuali, mNroSats, mDilut, mAlt, mGeoidH;
-  std::string mLatH, mLongH, mAltU, mGeoidHU;
-  bool first;
+  GpsPose mLastGpsPose, mCurGpsPose, mNextGpsPose;
   std::string log_file_path, frame_id, child_frame_id;
   std::ifstream log_file;
 };
