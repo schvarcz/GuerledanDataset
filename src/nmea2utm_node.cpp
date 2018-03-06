@@ -24,7 +24,6 @@ public:
     frame_id = nodeLocal.param("frame_id", frame_id);
     child_frame_id = nodeLocal.param("child_frame_id", child_frame_id);
     log_file_path = nodeLocal.param("log_file", log_file_path);
-    std::cout << log_file_path << std::endl;
 
     std::string ns = ros::this_node::getNamespace();
 

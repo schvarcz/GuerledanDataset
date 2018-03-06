@@ -64,7 +64,6 @@ public:
           (minY < y) && (y < maxY) &&
           (minZ < z) && (z < maxZ))
       {
-        cout << x << " - " << y << " - " << z << endl;
         point.x = x;
         point.y = y;
         point.z = z;
@@ -90,16 +89,6 @@ public:
       pc_msg.header.frame_id = frame_id;
       pc_pub.publish(pc_msg);
 
-//      geometry_msgs::TransformStamped pc_trans;
-//      pc_trans.header.stamp = current_time;
-//      pc_trans.header.frame_id = frame_id;
-//      pc_trans.child_frame_id = child_frame_id;
-
-//      pc_trans.transform.translation.x = 0.0;
-//      pc_trans.transform.translation.y = 0.0;
-//      pc_trans.transform.translation.z = 0.0;
-//      pc_trans.transform.rotation = tf::createQuaternionMsgFromYaw(0);
-//      tf_broadcaster.sendTransform(pc_trans);
       ros::spinOnce();
       r.sleep();
     }
@@ -123,8 +112,6 @@ int main(int argc, char **argv)
 
   MAPLoader mMAPLoader;
   mMAPLoader.run();
-
-//  ros::spin();
 
   return 0;
 }
