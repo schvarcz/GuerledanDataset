@@ -38,7 +38,7 @@ public:
 
     std::string ns = ros::this_node::getNamespace();
 
-    pc_pub = n.advertise<sensor_msgs::PointCloud>("point_cloud", 1);
+    pc_pub = n.advertise<sensor_msgs::PointCloud>("map/point_cloud", 1);
 
     log_file.open(log_file_path);
   }

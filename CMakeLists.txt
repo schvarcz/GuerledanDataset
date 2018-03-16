@@ -136,6 +136,7 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(nmea2utm_node src/nmea2utm_node.cpp)
+add_executable(state_node src/state_node.cpp)
 add_executable(map_node src/map_node.cpp)
 
 ## Rename C++ executable without prefix
@@ -150,6 +151,10 @@ add_executable(map_node src/map_node.cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(nmea2utm_node
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(state_node
   ${catkin_LIBRARIES}
 )
 
