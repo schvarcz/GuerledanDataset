@@ -18,28 +18,29 @@ class NMEAPlayer
 {
 public:
 
-  NMEAPlayer () : log_file_path("gps_converted"), frame_id("odom"), child_frame_id("base_link")
+  NMEAPlayer () : log_file_path("gps_converted"), frame_id("odom"), child_frame_id("base_link"), timeDiff(0), firstTime(0), EOFF(false)
   {
+    start_time = ros::Time::now();
+    last_time = start_time;
+
     ros::NodeHandle nodeLocal("~");
     frame_id = nodeLocal.param("frame_id", frame_id);
     child_frame_id = nodeLocal.param("child_frame_id", child_frame_id);
     log_file_path = nodeLocal.param("log_file", log_file_path);
+    timeDiff = nodeLocal.param("time_diff", timeDiff);
+    firstTime = nodeLocal.param("first_time", firstTime);
 
     std::string ns = ros::this_node::getNamespace();
 
     odom_pub = n.advertise<nav_msgs::Odometry>(ns+"/odom", 50);
     point_pub = n.advertise<geometry_msgs::PointStamped>(ns+"/pointStamped", 50);
     pose_pub = n.advertise<geometry_msgs::PoseStamped>(ns+"/poseStamped", 50);
-    last_time = ros::Time::now();
-    log_file.open(log_file_path);
-    std::string line;
-    std::getline(log_file, line);
   }
 
   bool readLine(GpsPose &gpsPose)
   {
     std::string line;
-    bool EOFF = (std::getline(log_file, line)? true : false);
+    EOFF = (std::getline(log_file, line)? true : false);
 
     if(!EOFF)
       return EOFF;
@@ -97,7 +98,7 @@ public:
   {
     geometry_msgs::PointStamped ptStamped;
     ptStamped.header.frame_id = frame_id;
-    ptStamped.header.stamp = ros::Time::now();
+    ptStamped.header.stamp = cur_time;
     ptStamped.point.x = mCurGpsPose.mUtmEast;
     ptStamped.point.y = mCurGpsPose.mUtmNorth;
     ptStamped.point.z = 124.97; //mCurGpsPose.mAlt;
@@ -109,7 +110,7 @@ public:
   {
     geometry_msgs::PoseStamped poseStamped;
     poseStamped.header.frame_id = frame_id;
-    poseStamped.header.stamp = ros::Time::now();
+    poseStamped.header.stamp = cur_time;
     poseStamped.pose.position.x = mCurGpsPose.mUtmEast;
     poseStamped.pose.position.y = mCurGpsPose.mUtmNorth;
     poseStamped.pose.position.z = 124.97; //mCurGpsPose.mAlt;
@@ -120,7 +121,6 @@ public:
 
   void publishOdom()
   {
-    ros::Time cur_time = ros::Time::now();
     double x = mCurGpsPose.mUtmEast;
     double y = mCurGpsPose.mUtmNorth;
     double z = 124.97; //mCurGpsPose.mAlt;
@@ -178,25 +178,47 @@ public:
     last_time = cur_time;
   }
 
+  void start()
+  {
+    log_file.close();
+    log_file.open(log_file_path);
+    std::string line;
+    std::getline(log_file, line);
+    this->readLine(mLastGpsPose);
+    this->readLine(mCurGpsPose);
+    this->readLine(mNextGpsPose);
+
+    if (firstTime == 0)
+      firstTime = mLastGpsPose.mTime + timeDiff;
+  }
+
+  void next()
+  {
+    mLastGpsPose = mCurGpsPose;
+    mCurGpsPose = mNextGpsPose;
+    this->readLine(mNextGpsPose);
+  }
+
   void run()
   {
     ros::Rate r(10);
     //Read a line
-    this->readLine(mLastGpsPose);
-    this->readLine(mCurGpsPose);
-    while(this->readLine(mNextGpsPose))
+    this->start();
+    while(EOFF)
     {
       //Publish position
       this->publishPoint();
-
       //Publish pose
       this->publishPose();
       //Odom pose
       this->publishOdom();
+
+
       ros::spinOnce();
-      r.sleep();
-      mLastGpsPose = mCurGpsPose;
-      mCurGpsPose = mNextGpsPose;
+
+      this->next();
+      cur_time.fromSec(start_time.toSec() + (mCurGpsPose.mTime + timeDiff) - firstTime);
+      ros::Time::sleepUntil(cur_time);
     }
   }
 
@@ -205,10 +227,12 @@ private:
   ros::Publisher odom_pub, point_pub, pose_pub;
   tf::TransformBroadcaster odom_broadcaster;
 
-  ros::Time last_time;
+  ros::Time last_time, cur_time, start_time;
+  double timeDiff, firstTime;
   GpsPose mLastGpsPose, mCurGpsPose, mNextGpsPose;
   std::string log_file_path, frame_id, child_frame_id;
   std::ifstream log_file;
+  bool EOFF;
 };
 
 int main(int argc, char** argv)
