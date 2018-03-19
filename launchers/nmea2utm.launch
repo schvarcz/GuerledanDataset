@@ -19,4 +19,5 @@
         <param name="maxY" value="6805940"/>
     </node>
     <node pkg="tf" type="static_transform_publisher" name="odom2map" args="253539.127054 6805743.6782 0 0 0 0  map odom 1000" />
+    <node pkg="tf" type="static_transform_publisher" name="bv2base_link" args="0 0 20 0 1.5708 0  base_link base_blue_view 1000" />
 </launch>

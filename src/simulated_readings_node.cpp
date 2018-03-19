@@ -16,15 +16,15 @@ class SimuReadings
 {
 public:
 
-  SimuReadings () : log_file_path("map.pts"), frame_id("odom"), child_frame_id("base_link"), pixel_size(1), lineSize(20)
+  SimuReadings () : log_file_path("map.pts"), frame_id("base_link"), pixel_size(1), lineSize(20)
   {
     minX = -numeric_limits<double>::max(); maxX = numeric_limits<double>::max();
     minY = -numeric_limits<double>::max(); maxY = numeric_limits<double>::max();
     minZ = -numeric_limits<double>::max(); maxZ = numeric_limits<double>::max();
     ros::NodeHandle nodeLocal("~");
     frame_id = nodeLocal.param("frame_id", frame_id);
-    child_frame_id = nodeLocal.param("child_frame_id", child_frame_id);
     pixel_size = nodeLocal.param("pixel_size", pixel_size);
+    lineSize = nodeLocal.param("line_size", lineSize);
     log_file_path = nodeLocal.param("log_file", log_file_path);
     minX = nodeLocal.param("minX", minX);
     maxX = nodeLocal.param("maxX", maxX);
@@ -88,14 +88,15 @@ public:
       ros::Duration(1.0).sleep();
     }
 
+    laser_msg.ranges.clear();
+
     computeLine();
     computeScan();
     showInImage();
-
-    laser_msg.ranges.clear();
     laser_msg.header.stamp = pose_msg.header.stamp;
-    laser_msg.angle_min = minBeta;
-    laser_msg.angle_min = maxBeta;
+//    laser_msg.scan_time = pose_msg.header.stamp;
+//    laser_msg.angle_min = minBeta;
+//    laser_msg.angle_min = maxBeta;
     publishScan();
   }
 
@@ -110,30 +111,47 @@ public:
     double yaw = tf::getYaw(transform.getRotation());
 
     pt1.x = lineSize*0.5*cos(yaw + M_PI_2) - 0*sin(yaw + M_PI_2) + ptBarco.x;
-    pt1.y = lineSize*0.5*sin(yaw + M_PI_2) - 0*cos(yaw + M_PI_2) + ptBarco.y;
+    pt1.y = -(lineSize*0.5*sin(yaw + M_PI_2) - 0*cos(yaw + M_PI_2)) + ptBarco.y;
 
     pt2.x = lineSize*0.5*cos(yaw - M_PI_2) - 0*sin(yaw - M_PI_2) + ptBarco.x;
-    pt2.y = lineSize*0.5*sin(yaw - M_PI_2) - 0*cos(yaw - M_PI_2) + ptBarco.y;
+    pt2.y = -(lineSize*0.5*sin(yaw - M_PI_2) - 0*cos(yaw - M_PI_2)) + ptBarco.y;
+
+    ptHeading.x = ptBarco.x + 5*cos(yaw);
+    ptHeading.y = ptBarco.y - 5*sin(yaw);
   }
 
   void computeScan()
   {
     double c = (pt2.x - pt1.x)/lineSize;
     double s = (pt2.y - pt1.y)/lineSize;
-    for(double d =0; d < lineSize; d+=0.5)
+    bool firstAngle = true;
+    for(double d = lineSize; d >= 0; d-=0.5)
     {
       double x = (pt1.x + d*c)*pixel_size + minX, y = (mMapImage.rows - (pt1.y + d*s))*pixel_size + minY, z = mMapImage.at<float>(std::round(pt1.y + d*s), std::round(pt1.x + d*c));
-      double r = sqrt(pow(transform.getOrigin().x() - x, 2)
-                    + pow(transform.getOrigin().y() - y, 2)
-                    + pow(transform.getOrigin().z() - z, 2));
-      double roll   = std::atan2(z-transform.getOrigin().z(), x-transform.getOrigin().x()),
-             pitch  = std::atan2(y-transform.getOrigin().y(), z-transform.getOrigin().z()),
-             yaw    = std::atan2(y-transform.getOrigin().y(), x-transform.getOrigin().x());
-      cout << roll << endl;
 
-      //if it is in the roll range...
-      laser_msg.ranges.push_back(r);
+      if(z != 0)
+      {
+        double r = sqrt(pow(transform.getOrigin().x() - x, 2)
+                      + pow(transform.getOrigin().y() - y, 2)
+                      + pow(transform.getOrigin().z() - z, 2));
+
+        double roll   = std::atan2(lineSize/2. - d, transform.getOrigin().z()-z);
+
+        if (firstAngle)
+        {
+          laser_msg.angle_min = roll;
+          firstAngle = false;
+        }
+        else
+          laser_msg.angle_max = roll;
+
+        //if it is in the roll range...
+        laser_msg.ranges.push_back(r);
+        laser_msg.range_max = std::max(laser_msg.range_max, (float)r);
+      }
     }
+    cout << laser_msg.angle_min << " - " << laser_msg.angle_max << endl;
+    laser_msg.angle_increment = (laser_msg.angle_max - laser_msg.angle_min)/laser_msg.ranges.size();
   }
 
   void showInImage()
@@ -142,14 +160,15 @@ public:
     cv::cvtColor(mMapImage, temp, CV_GRAY2RGB);
 
     cv::circle(temp, ptBarco, 2, cv::Scalar(255,0,0), -1);
-    cv::line(temp, pt1, pt2, cv::Scalar(0, 0, 255));
+    cv::line(temp, pt1, pt2, cv::Scalar(0, 255, 0));
 
-    double c = (pt2.x - pt1.x)/lineSize;
-    double s = (pt2.y - pt1.y)/lineSize;
-    for(double d = 0; d < lineSize; d+=0.5)
-    {
-      cv::circle(temp, cv::Point(pt1.x + d*c, pt1.y + d*s), 1, cv::Scalar(0,255,0), -1);
-    }
+//    double c = (pt2.x - pt1.x)/lineSize;
+//    double s = (pt2.y - pt1.y)/lineSize;
+//    for(double d = 0; d <= lineSize; d+=0.5)
+//    {
+//      cv::circle(temp, cv::Point(pt1.x + d*c, pt1.y + d*s), 1, cv::Scalar(0,255,0), -1);
+//    }
+    cv::line(temp, ptBarco, ptHeading, cv::Scalar(0, 0, 255));
     cv::imshow("Robot pose", temp);
     cv::waitKey(33);
   }
@@ -173,10 +192,10 @@ private:
   cv::Mat mMapImage;
   geometry_msgs::PoseStamped lastPose;
   std::ifstream log_file;
-  cv::Point2f pt1, pt2, ptBarco;
+  cv::Point2f pt1, pt2, ptBarco, ptHeading;
   tf::StampedTransform transform;
 
-  std::string log_file_path, frame_id, child_frame_id;
+  std::string log_file_path, frame_id;
 };
 
 int main(int argc, char** argv)
