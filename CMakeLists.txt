@@ -15,6 +15,8 @@ find_package(catkin REQUIRED COMPONENTS
     geometry_msgs
 )
 
+find_package(OpenCV)
+
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -120,6 +122,7 @@ catkin_package(
 include_directories(
 # include
  ${catkin_INCLUDE_DIRS}
+ ${OpenCV_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -138,6 +141,7 @@ include_directories(
 add_executable(nmea2utm_node src/nmea2utm_node.cpp)
 add_executable(state_node src/state_node.cpp)
 add_executable(map_node src/map_node.cpp)
+add_executable(simulated_readings_node src/simulated_readings_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -160,6 +164,11 @@ target_link_libraries(state_node
 
 target_link_libraries(map_node
     ${catkin_LIBRARIES}
+)
+
+target_link_libraries(simulated_readings_node
+    ${catkin_LIBRARIES}
+    ${OpenCV_LIBRARIES}
 )
 
 #############

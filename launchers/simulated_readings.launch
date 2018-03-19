@@ -1,0 +1,12 @@
+<launch>
+
+    <include file="$(find helius)/launchers/nmea2utm.launch" />
+
+    <node pkg="helius" type="simulated_readings_node" name="simulated_readings_node" output="screen">
+        <param name="log_file" value="/home/schvarcz/Dropbox/Doutorado-ENSTA/Guerlédan_2013_06/MRIS_XYZ_Guerledan_Retenue_2013_06_L93_IGN69_1x1.pts"/>
+        <param name="minX" value="253150"/>
+        <param name="maxX" value="253600"/>
+        <param name="minY" value="6805440"/>
+        <param name="maxY" value="6805940"/>
+    </node>
+</launch>
