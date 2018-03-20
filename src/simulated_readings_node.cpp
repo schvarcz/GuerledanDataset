@@ -97,7 +97,8 @@ public:
 //    laser_msg.scan_time = pose_msg.header.stamp;
 //    laser_msg.angle_min = minBeta;
 //    laser_msg.angle_min = maxBeta;
-    publishScan();
+
+    scan_pub.publish(laser_msg);
   }
 
   void computeLine()
@@ -150,7 +151,6 @@ public:
         laser_msg.range_max = std::max(laser_msg.range_max, (float)r);
       }
     }
-    cout << laser_msg.angle_min << " - " << laser_msg.angle_max << endl;
     laser_msg.angle_increment = (laser_msg.angle_max - laser_msg.angle_min)/laser_msg.ranges.size();
   }
 
@@ -171,11 +171,6 @@ public:
     cv::line(temp, ptBarco, ptHeading, cv::Scalar(0, 0, 255));
     cv::imshow("Robot pose", temp);
     cv::waitKey(33);
-  }
-
-  void publishScan()
-  {
-    scan_pub.publish(laser_msg);
   }
 
 private:
