@@ -1,6 +1,6 @@
 <launch>
     <node pkg="helius" type="state_node" name="state_node" output="screen">
-        <param name="log_file" value="/home/schvarcz/Dropbox/Doutorado-ENSTA/Guerledan/2017/BUBBLE_WORKSPACE/log/logstate_2017-10-13_10h59min56s.csv"/>
+        <param name="log_file" value="/home/schvarcz/Dropbox/Doutorado-ENSTA/Guerledan/2017/BUBBLE_WORKSPACE/log/logstate_2017-10-13_10h59min56s_limpo.csv"/>
         <param name="time_diff" value="0"/>
         <param name="first_time" value="0"/>
     </node>
@@ -32,13 +32,13 @@
             <param name="useNreadings" value="40" />
             <param name="thresholdScan" value="0.15" />
             <param name="thresholdOdomOmega" value="0.5" />
-            <param name="initialPoseX" value="253559.127054" />
-            <param name="initialPoseY" value="6805737.6782" />
+            <param name="initialPoseX" value="253539.127054" />
+            <param name="initialPoseY" value="6805743.6782" />
             <param name="initialPoseZ" value="122." />
-            <param name="initialPoseTH" value="0." />
+            <param name="initialPoseTH" value="0.4886922" /> <!-- 0.4886922, 2.0717058-->
             <param name="uncertaintyXY" value="10." />
             <param name="uncertaintyZ" value="3." />
-            <param name="uncertaintyTH" value="0." />
+            <param name="uncertaintyTH" value="0.1672665" />
             <param name="vel_bounding_lb" value="1." />
             <param name="vel_bounding_ub" value="1." />
             <param name="odom_yaw_bounding_lb" value="1." />
@@ -47,5 +47,5 @@
     </node>
     <node pkg="rviz" type="rviz" name="rviz" args="-d $(find helius)/config/config.rviz" />
     <node pkg="tf" type="static_transform_publisher" name="odom2map" args="253539.127054 6805743.6782 0 0 0 0  map odom 1000" />
-    <node pkg="tf" type="static_transform_publisher" name="bv2base_link" args="0 0 20 0 1.5708 0  base_link base_blue_view 1000" />
+    <node pkg="tf" type="static_transform_publisher" name="bv2base_link" args="0 0 0 0 1.5708 0  base_link base_blue_view 1000" />
 </launch>

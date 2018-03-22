@@ -5,7 +5,7 @@
         <param name="first_time" value="39596"/>
     </node>-->
     <node pkg="helius" type="state_node" name="state_node" output="screen">
-        <param name="log_file" value="/home/schvarcz/Dropbox/Doutorado-ENSTA/Guerledan/2017/BUBBLE_WORKSPACE/log/logstate_2017-10-13_10h59min56s.csv"/>
+        <param name="log_file" value="/home/schvarcz/Dropbox/Doutorado-ENSTA/Guerledan/2017/BUBBLE_WORKSPACE/log/logstate_2017-10-13_10h59min56s_limpo.csv"/>
         <param name="time_diff" value="0"/>
         <param name="first_time" value="0"/>
     </node>
