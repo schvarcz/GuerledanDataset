@@ -7,6 +7,7 @@ Panels:
         - /Global Options1
         - /Status1
         - /Odometry1/Shape1
+        - /LaserScan1
       Splitter Ratio: 0.5
     Tree Height: 728
   - Class: rviz/Selection
@@ -87,7 +88,7 @@ Visualization Manager:
           Scale: 1
           Value: true
         Value: true
-      Enabled: true
+      Enabled: false
       Keep: 1000
       Name: Odometry
       Position Tolerance: 0.100000001
@@ -103,7 +104,7 @@ Visualization Manager:
         Value: Arrow
       Topic: /odom
       Unreliable: false
-      Value: true
+      Value: false
     - Alpha: 1
       Axes Length: 1
       Axes Radius: 0.100000001
@@ -142,8 +143,8 @@ Visualization Manager:
       Queue Size: 1
       Selectable: true
       Size (Pixels): 3
-      Size (m): 1
-      Style: Flat Squares
+      Size (m): 1.20000005
+      Style: Boxes
       Topic: /map/point_cloud
       Unreliable: false
       Use Fixed Frame: true
@@ -172,8 +173,8 @@ Visualization Manager:
       Queue Size: 10
       Selectable: true
       Size (Pixels): 3
-      Size (m): 1
-      Style: Flat Squares
+      Size (m): 2
+      Style: Boxes
       Topic: /scan
       Unreliable: false
       Use Fixed Frame: true
@@ -242,16 +243,16 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 438.473633
+      Distance: 280.440948
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 253413.906
-        Y: 6805745.5
-        Z: 100.720688
+        X: 253488.297
+        Y: 6805751.5
+        Z: 111.013733
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
@@ -260,7 +261,7 @@ Visualization Manager:
       Pitch: 1.56979632
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 5.95858574
+      Yaw: 5.81175566
     Saved: ~
 Window Geometry:
   Displays:

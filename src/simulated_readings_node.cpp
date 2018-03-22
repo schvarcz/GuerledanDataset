@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <ros/ros.h>
@@ -10,6 +11,7 @@
 #include <sstream>
 #include <math.h>
 #include <opencv2/opencv.hpp>
+
 using namespace std;
 
 class SimuReadings
@@ -91,7 +93,8 @@ public:
     laser_msg.ranges.clear();
 
     computeLine();
-    computeScan();
+//    computeScan();
+    computeScanRayTracing();
     showInImage();
     laser_msg.header.stamp = pose_msg.header.stamp;
 //    laser_msg.scan_time = pose_msg.header.stamp;
@@ -126,32 +129,107 @@ public:
     double c = (pt2.x - pt1.x)/lineSize;
     double s = (pt2.y - pt1.y)/lineSize;
     bool firstAngle = true;
+    vector<pair<double, double>> thetaRho;
     for(double d = lineSize; d >= 0; d-=0.5)
     {
-      double x = (pt1.x + d*c)*pixel_size + minX, y = (mMapImage.rows - (pt1.y + d*s))*pixel_size + minY, z = mMapImage.at<float>(std::round(pt1.y + d*s), std::round(pt1.x + d*c));
+      double x = (pt1.x + d*c)*pixel_size + minX,
+             y = (mMapImage.rows - (pt1.y + d*s))*pixel_size + minY,
+             z = mMapImage.at<float>(std::round(pt1.y + d*s), std::round(pt1.x + d*c));
+
+//      mMapImage.at<float>(std::round(pt1.x + d*c),std::round(pt1.y + d*s)) = 0;
 
       if(z != 0)
       {
         double r = sqrt(pow(transform.getOrigin().x() - x, 2)
                       + pow(transform.getOrigin().y() - y, 2)
                       + pow(transform.getOrigin().z() - z, 2));
+//        double r = sqrt(pow((d-lineSize/2)*pixel_size, 2)
+//                      + pow(transform.getOrigin().z() - z, 2));
+//        double r = sqrt(pow(transform.getOrigin().z() - z, 2));
 
+//        cout << r << " , " <<  transform.getOrigin().z() - z << endl;
         double roll   = std::atan2(lineSize/2. - d, transform.getOrigin().z()-z);
 
-        if (firstAngle)
-        {
-          laser_msg.angle_min = roll;
-          firstAngle = false;
-        }
-        else
-          laser_msg.angle_max = roll;
+        thetaRho.push_back(make_pair(roll, r));
+
+//        if (firstAngle)
+//        {
+//          laser_msg.angle_min = roll;
+//          firstAngle = false;
+//        }
+//        else
+//          laser_msg.angle_max = roll;
 
         //if it is in the roll range...
-        laser_msg.ranges.push_back(r);
-        laser_msg.range_max = std::max(laser_msg.range_max, (float)r);
+//        laser_msg.ranges.push_back(r);
+//        laser_msg.range_max = std::max(laser_msg.range_max, (float)r);
       }
     }
+
+//    std::sort(thetaRho.begin(), thetaRho.end(), [](auto &a, auto &b) -> bool
+//    {
+//        return a.first < b.first;
+//    });
+
+    for(auto &it : thetaRho)
+    {
+        laser_msg.ranges.push_back(it.second);
+        laser_msg.range_max = std::max(laser_msg.range_max, (float)it.second);
+    }
+
+    laser_msg.angle_min = thetaRho.front().first;
+    laser_msg.angle_max = thetaRho.back().first;
     laser_msg.angle_increment = (laser_msg.angle_max - laser_msg.angle_min)/laser_msg.ranges.size();
+  }
+
+  void computeScanRayTracing()
+  {
+    double c = (pt2.x - pt1.x)/lineSize;
+    double s = (pt2.y - pt1.y)/lineSize;
+
+    double betaMin = -M_PI_2, betaMax = M_PI_2, betaStep = M_PI/180;
+    double range_max = std::numeric_limits<double>::max(), rangeStep = 1;
+    for(double alfa = betaMin; alfa <= betaMax; alfa += betaStep)
+    {
+      bool hitted = false;
+      for(double d = 0; d< range_max; d += rangeStep)
+      {
+        //Calculate the X, Y, Z of current position by RayTracing
+        double dd = d*sin(alfa);
+        double x = transform.getOrigin().x() + dd*c,
+               y = transform.getOrigin().y() - dd*s,
+               z = transform.getOrigin().z() - d*cos(alfa);
+
+
+        //Calculate the X, Y for the image and retrives the value of Z
+        double xI = (x-minX)/pixel_size,
+               yI = mMapImage.rows - (y-minY)/pixel_size;
+        if((mMapImage.cols < xI) || (xI<0))
+          break;
+        if((mMapImage.rows < yI) || (yI<0))
+          break;
+        double zI = mMapImage.at<float>(yI, xI);
+        if(zI >= z)
+        {
+          double r = sqrt(pow(transform.getOrigin().x() - x, 2)
+                        + pow(transform.getOrigin().y() - y, 2)
+                        + pow(transform.getOrigin().z() - z, 2));
+
+          //Validate the obstacle
+          laser_msg.ranges.push_back(r);
+          laser_msg.range_max = std::max(laser_msg.range_max, (float)r);
+          hitted = true;
+          break;
+        }
+      }
+      if (!hitted)
+        laser_msg.ranges.push_back(std::numeric_limits<double>::quiet_NaN());
+
+    }
+
+    laser_msg.angle_min = betaMax;
+    laser_msg.angle_max = betaMin;
+    laser_msg.angle_increment = -betaStep;
   }
 
   void showInImage()
