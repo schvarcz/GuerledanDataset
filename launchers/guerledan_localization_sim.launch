@@ -35,9 +35,9 @@
             <param name="initialPoseX" value="253539.127054" />
             <param name="initialPoseY" value="6805743.6782" />
             <param name="initialPoseZ" value="122." />
-            <param name="initialPoseTH" value="0.4886922" /> <!-- 0.4886922, 2.0717058-->
-            <param name="uncertaintyXY" value="10." />
-            <param name="uncertaintyZ" value="3." />
+            <param name="initialPoseTH" value="-0.535816" /> <!-- 0.4886922, 2.0717058-->
+            <param name="uncertaintyXY" value="30." />
+            <param name="uncertaintyZ" value="5." />
             <param name="uncertaintyTH" value="0.1672665" />
             <param name="vel_bounding_lb" value="1." />
             <param name="vel_bounding_ub" value="1." />
