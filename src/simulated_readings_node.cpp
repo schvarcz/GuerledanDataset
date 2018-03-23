@@ -200,15 +200,20 @@ public:
                y = transform.getOrigin().y() - dd*s,
                z = transform.getOrigin().z() - d*cos(alfa);
 
-
         //Calculate the X, Y for the image and retrives the value of Z
         double xI = (x-minX)/pixel_size,
                yI = mMapImage.rows - (y-minY)/pixel_size;
+
         if((mMapImage.cols < xI) || (xI<0))
           break;
         if((mMapImage.rows < yI) || (yI<0))
           break;
+
         double zI = mMapImage.at<float>(yI, xI);
+
+        if(zI == 0)
+          break;
+
         if(zI >= z)
         {
           double r = sqrt(pow(transform.getOrigin().x() - x, 2)
