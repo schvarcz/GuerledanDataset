@@ -18,7 +18,8 @@ class SimuReadings
 {
 public:
 
-  SimuReadings () : log_file_path("map.pts"), frame_id("base_link"), pixel_size(1), lineSize(20)
+  SimuReadings () : log_file_path("map.pts"), frame_id("base_link"), pixel_size(1), lineSize(20), angle_min(-M_PI_2), angle_max(M_PI_2), angle_increment(M_PI/180),
+    range_max(std::numeric_limits<double>::max()), rangeStep(1)
   {
     minX = -numeric_limits<double>::max(); maxX = numeric_limits<double>::max();
     minY = -numeric_limits<double>::max(); maxY = numeric_limits<double>::max();
@@ -34,6 +35,13 @@ public:
     maxY = nodeLocal.param("maxY", maxY);
     minZ = nodeLocal.param("minZ", minZ);
     maxZ = nodeLocal.param("maxZ", maxZ);
+
+    angle_min = nodeLocal.param("angle_min", angle_min);
+    angle_max = nodeLocal.param("angle_max", angle_max);
+    angle_increment = nodeLocal.param("angle_increment", angle_increment);
+
+    range_max = nodeLocal.param("range_max", range_max);
+    rangeStep = nodeLocal.param("rangeStep", rangeStep);
 
     std::string ns = ros::this_node::getNamespace();
 
@@ -136,18 +144,12 @@ public:
              y = (mMapImage.rows - (pt1.y + d*s))*pixel_size + minY,
              z = mMapImage.at<float>(std::round(pt1.y + d*s), std::round(pt1.x + d*c));
 
-//      mMapImage.at<float>(std::round(pt1.x + d*c),std::round(pt1.y + d*s)) = 0;
-
       if(z != 0)
       {
         double r = sqrt(pow(transform.getOrigin().x() - x, 2)
                       + pow(transform.getOrigin().y() - y, 2)
                       + pow(transform.getOrigin().z() - z, 2));
-//        double r = sqrt(pow((d-lineSize/2)*pixel_size, 2)
-//                      + pow(transform.getOrigin().z() - z, 2));
-//        double r = sqrt(pow(transform.getOrigin().z() - z, 2));
 
-//        cout << r << " , " <<  transform.getOrigin().z() - z << endl;
         double roll   = std::atan2(lineSize/2. - d, transform.getOrigin().z()-z);
 
         thetaRho.push_back(make_pair(roll, r));
@@ -187,9 +189,7 @@ public:
     double c = (pt2.x - pt1.x)/lineSize;
     double s = (pt2.y - pt1.y)/lineSize;
 
-    double betaMin = -M_PI_2, betaMax = M_PI_2, betaStep = M_PI/180;
-    double range_max = std::numeric_limits<double>::max(), rangeStep = 1;
-    for(double alfa = betaMin; alfa <= betaMax; alfa += betaStep)
+    for(double alfa = angle_max; alfa >= angle_min; alfa -= angle_increment)
     {
       bool hitted = false;
       for(double d = 0; d< range_max; d += rangeStep)
@@ -229,12 +229,11 @@ public:
       }
       if (!hitted)
         laser_msg.ranges.push_back(std::numeric_limits<double>::quiet_NaN());
-
     }
 
-    laser_msg.angle_min = betaMax;
-    laser_msg.angle_max = betaMin;
-    laser_msg.angle_increment = -betaStep;
+    laser_msg.angle_min = angle_min;
+    laser_msg.angle_max = angle_max;
+    laser_msg.angle_increment = angle_increment;
   }
 
   void showInImage()
@@ -266,7 +265,8 @@ private:
   sensor_msgs::PointCloud mPC;
   double minX, maxX, minY, maxY, minZ, maxZ;
   double lineSize, minBeta, maxBeta;
-  double pixel_size;
+  double pixel_size, angle_min, angle_max, angle_increment;
+  double range_max, rangeStep;
   cv::Mat mMapImage;
   geometry_msgs::PoseStamped lastPose;
   std::ifstream log_file;
