@@ -1,0 +1,23 @@
+<launch>
+    <node pkg="intervalar_localization" type="interval_localization_3D" name="interval_localization_3D" output="screen" >
+        <!-- <remap from="/odom" to="/odom_encoder" /> -->
+        <param name="localizeFPS" value="2" />
+        <param name="useNreadings" value="40" />
+        <param name="thresholdScan" value="0.15" />
+        <param name="thresholdOdomOmega" value="0.5" />
+        <param name="initialPoseX" value="253539.127054" />
+        <param name="initialPoseY" value="6805743.6782" />
+        <param name="initialPoseZ" value="122." />
+        <param name="initialPoseTH" value="-0.535816" /> <!-- 0.4886922, 2.0717058-->
+        <param name="uncertaintyXY" value="30." />
+        <param name="uncertaintyZ" value="5." />
+        <param name="uncertaintyTH" value="0.1672665" />
+        <param name="vel_bounding_lb" value="1." />
+        <param name="vel_bounding_ub" value="1." />
+        <param name="odom_yaw_bounding_lb" value="1." />
+        <param name="odom_yaw_bounding_ub" value="1." />
+        <param name="laserscan_uncertainty" value="0.5" />
+        <param name="laserscan_bearing_uncertainty" value="0.09" />
+        <param name="minNroNodes" value="10" />
+    </node>
+</launch>
