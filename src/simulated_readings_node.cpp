@@ -18,7 +18,7 @@ class SimuReadings
 {
 public:
 
-  SimuReadings () : log_file_path("map.pts"), frame_id("base_link"), pixel_size(1), lineSize(20), angle_min(-M_PI_2), angle_max(M_PI_2), angle_increment(M_PI/180),
+  SimuReadings () : log_file_path("map.pts"), frame_id("base_link"), pixel_size(1), lineSize(20), angle_min(-M_PI_2), angle_max(M_PI_2), angle_increment(M_PI/180), bvPitch(90*M_PI/180),
     range_max(std::numeric_limits<double>::max()), rangeStep(1)
   {
     minX = -numeric_limits<double>::max(); maxX = numeric_limits<double>::max();
@@ -35,6 +35,7 @@ public:
     maxY = nodeLocal.param("maxY", maxY);
     minZ = nodeLocal.param("minZ", minZ);
     maxZ = nodeLocal.param("maxZ", maxZ);
+    bvPitch = nodeLocal.param("blueview_pitch", bvPitch);
 
     angle_min = nodeLocal.param("angle_min", angle_min);
     angle_max = nodeLocal.param("angle_max", angle_max);
@@ -45,15 +46,17 @@ public:
 
     std::string ns = ros::this_node::getNamespace();
 
-    sub1 = n.subscribe("/poseStamped", 1000000, &SimuReadings::poseCallback, this);
+    sub1 = n.subscribe("/poseStamped", 1, &SimuReadings::poseCallback, this);
     scan_pub = n.advertise<sensor_msgs::LaserScan>(ns+"/scan", 50);
     laser_msg.header.frame_id = frame_id;
 
 
     log_file.open(log_file_path);
 
-    mMapImage.create((maxY - minY)/pixel_size,(maxX - minX)/pixel_size, CV_32FC1);
+    mMapImage = cv::Mat::zeros((maxY - minY)/pixel_size, (maxX - minX)/pixel_size, CV_32FC1);
     loadMap();
+
+    std::cout << "blueview_pitch: " << bvPitch << std::endl;
   }
 
   void loadMap()
@@ -77,10 +80,11 @@ public:
           (minZ < z) && (z < maxZ))
       {
         x = (x-minX)/pixel_size;
-        y = (y-minY)/pixel_size;
-        mMapImage.at<float>(mMapImage.rows-y, x) = z;
+        y = mMapImage.rows - (y-minY)/pixel_size;
+        mMapImage.at<float>(y,x) = z;
       }
     }
+
     cv::imshow("Robot pose", mMapImage);
     cv::waitKey(33);
   }
@@ -102,7 +106,8 @@ public:
 
     computeLine();
 //    computeScan();
-    computeScanRayTracing();
+//    computeScanRayTracing();
+    computeScanRayTracing3D();
     showInImage();
     laser_msg.header.stamp = pose_msg.header.stamp;
 //    laser_msg.scan_time = pose_msg.header.stamp;
@@ -204,9 +209,67 @@ public:
         double xI = (x-minX)/pixel_size,
                yI = mMapImage.rows - (y-minY)/pixel_size;
 
-        if((mMapImage.cols < xI) || (xI<0))
+        if((mMapImage.cols-1 < xI) || (xI<0))
           break;
-        if((mMapImage.rows < yI) || (yI<0))
+        if((mMapImage.rows-1 < yI) || (yI<0))
+          break;
+
+        double zI = mMapImage.at<float>(yI, xI);
+
+        if(zI == 0)
+          break;
+
+        if(zI >= z)
+        {
+          double r = sqrt(pow(transform.getOrigin().x() - x, 2)
+                        + pow(transform.getOrigin().y() - y, 2)
+                        + pow(transform.getOrigin().z() - z, 2));
+
+          //Validate the obstacle
+          laser_msg.ranges.push_back(r);
+          laser_msg.range_max = std::max(laser_msg.range_max, (float)r);
+          hitted = true;
+          break;
+        }
+      }
+      if (!hitted)
+        laser_msg.ranges.push_back(std::numeric_limits<double>::quiet_NaN());
+    }
+
+    laser_msg.angle_min = angle_min;
+    laser_msg.angle_max = angle_max;
+    laser_msg.angle_increment = angle_increment;
+  }
+
+  void computeScanRayTracing3D()
+  {
+    double c = (pt2.x - pt1.x)/lineSize;
+    double s = (pt2.y - pt1.y)/lineSize;
+    double theta = tf::getYaw(transform.getRotation());
+    double pitch = bvPitch;
+
+//    for(double beta = angle_max; beta >= angle_min; beta -= angle_increment)
+    for(double beta = angle_min; beta <= angle_max; beta += angle_increment)
+    {
+      bool hitted = false;
+      for(double d = 0; d< range_max; d += rangeStep)
+      {
+        //Calculate the X, Y, Z of current position by RayTracing
+//        double dd = d*sin(beta);
+//        double x = transform.getOrigin().x() + d*sin(beta)*c,
+//               y = transform.getOrigin().y() - d*sin(beta)*s,
+//               z = transform.getOrigin().z() - d*cos(beta);
+        double x = transform.getOrigin().x() + d*cos(beta)*cos(theta)*cos(pitch) - d*sin(beta)*sin(theta),
+               y = transform.getOrigin().y() + d*cos(beta)*sin(theta)*cos(pitch) + d*sin(beta)*cos(theta),
+               z = transform.getOrigin().z() - d*cos(beta)*sin(pitch);
+
+        //Calculate the X, Y for the image and retrives the value of Z
+        double xI = (x-minX)/pixel_size,
+               yI = mMapImage.rows - (y-minY)/pixel_size;
+
+        if((mMapImage.cols-1 < xI) || (xI<0))
+          break;
+        if((mMapImage.rows-1 < yI) || (yI<0))
           break;
 
         double zI = mMapImage.at<float>(yI, xI);
@@ -238,11 +301,17 @@ public:
 
   void showInImage()
   {
-    cv::Mat temp;
-    cv::cvtColor(mMapImage, temp, CV_GRAY2RGB);
+    cv::Mat temp = mMapImage.clone();
+    cv::Mat mask = temp>0;
+    double minc, maxc;
 
+//    cv::minMaxLoc(temp, &minc, &maxc,NULL,NULL, mask);
+//    cv::subtract(temp, cv::Scalar(minc), temp, mask);
+//    temp = temp/(maxc-minc);
+
+    cv::cvtColor(temp, temp, CV_GRAY2RGB);
     cv::circle(temp, ptBarco, 2, cv::Scalar(255,0,0), -1);
-    cv::line(temp, pt1, pt2, cv::Scalar(0, 255, 0));
+//    cv::line(temp, pt1, pt2, cv::Scalar(0, 255, 0));
 
 //    double c = (pt2.x - pt1.x)/lineSize;
 //    double s = (pt2.y - pt1.y)/lineSize;
@@ -250,6 +319,37 @@ public:
 //    {
 //      cv::circle(temp, cv::Point(pt1.x + d*c, pt1.y + d*s), 1, cv::Scalar(0,255,0), -1);
 //    }
+
+    double theta = tf::getYaw(transform.getRotation());
+    double pitch = bvPitch;
+
+    cv::Point laser[1][laser_msg.ranges.size()+1], nextPoint;
+    int i = 1;
+
+    laser[0][0] = cv::Point((transform.getOrigin().x()-minX)/pixel_size, mMapImage.rows - (transform.getOrigin().y()-minY)/pixel_size);
+//    cout << (transform.getOrigin().x()-minX)/pixel_size << " - " << mMapImage.rows - (transform.getOrigin().y()-minY)/pixel_size << endl;
+    
+    for(double beta = angle_max; beta >= angle_min; beta -= angle_increment)
+    {
+      double d = 10;
+
+      double x = transform.getOrigin().x() + d*cos(beta)*cos(theta)*cos(pitch) - d*sin(beta)*sin(theta),
+             y = transform.getOrigin().y() + d*cos(beta)*sin(theta)*cos(pitch) + d*sin(beta)*cos(theta),
+             z = transform.getOrigin().z() - d*cos(beta)*sin(pitch);
+
+      //Calculate the X, Y for the image and retrives the value of Z
+      nextPoint.x = (x-minX)/pixel_size,
+      nextPoint.y = mMapImage.rows - (y-minY)/pixel_size;
+      laser[0][i] = nextPoint;
+      i++;
+
+    }
+
+    const cv::Point* ppt[1] = { laser[0] };
+    int npt[] = {laser_msg.ranges.size()+1};
+
+//    cv::fillPoly( temp, ppt, npt, 1, cv::Scalar( 255, 0, 255 ), 8 );
+
     cv::line(temp, ptBarco, ptHeading, cv::Scalar(0, 0, 255));
     cv::imshow("Robot pose", temp);
     cv::waitKey(33);
@@ -267,6 +367,7 @@ private:
   double lineSize, minBeta, maxBeta;
   double pixel_size, angle_min, angle_max, angle_increment;
   double range_max, rangeStep;
+  double bvPitch;
   cv::Mat mMapImage;
   geometry_msgs::PoseStamped lastPose;
   std::ifstream log_file;

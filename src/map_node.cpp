@@ -83,7 +83,7 @@ public:
     {
 
       ros::Time current_time = ros::Time::now();
-      std::cout << current_time << std::endl;
+//      std::cout << current_time << std::endl;
 
       pc_msg.header.stamp = current_time;
       pc_msg.header.frame_id = frame_id;
