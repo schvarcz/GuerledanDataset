@@ -1,8 +1,6 @@
 <launch>
-    <arg name="sonar_address" default="/home/schvarcz/Desktop/sonar_guerledan/Oct_13_2017_110048.son" />
+    <arg name="sonar_address" default="/home/schvarcz/Desktop/sonar_guerledan/Oct_13_2017_110048" />
     <arg name="color_map_file" default="$(find blueview_ros)/colormaps/jet.cmap" />
-
-    <include file="$(find helius)/launchers/nmea2utm.launch" />
 
     <node pkg="blueview_ros" name="blueview_ros_image" type="blueview_ros_node" output="screen">
         <param name="address" type="string" value="$(arg sonar_address)" /> <!-- if net, ip address : if file, path -->
@@ -15,10 +13,26 @@
         <param name="tick_rate" type="double" value="10.0" />
         <param name="max_dist" type="double" value="40" />
         <param name="min_dist" type="double" value="0" />
-        <param name="base_link_name" type="string" value="base_link" />
+        <param name="base_link_name" type="string" value="base_blue_view" />
         <param name="time_diff" value="7200"/>
         <param name="first_time" value="39596"/>
         <param name="threshold" value="0"/>
     </node>
 
+    <node pkg="helius" type="state_node" name="state_node" output="screen">
+        <param name="log_file" value="/home/schvarcz/Dropbox/Doutorado-ENSTA/Guerledan/2017/BUBBLE_WORKSPACE/log/logstate_2017-10-13_10h59min56s_limpo.csv"/>
+        <param name="time_diff" value="0"/>
+        <param name="first_time" value="0"/>
+    </node>
+
+    <node pkg="helius" type="map_node" name="map_node" output="screen">
+        <param name="log_file" value="/home/schvarcz/Dropbox/Doutorado-ENSTA/Guerlédan_2013_06/MRIS_XYZ_Guerledan_Retenue_2013_06_L93_IGN69_1x1.pts"/>
+        <param name="minX" value="253150"/>
+        <param name="maxX" value="253600"/>
+        <param name="minY" value="6805440"/>
+        <param name="maxY" value="6805940"/>
+    </node>
+    <node pkg="tf" type="static_transform_publisher" name="odom2map" args="253539.127054 6805743.6782 0 0 0 0  map odom 1000" />
+    <!--<node pkg="tf" type="static_transform_publisher" name="bv2base_link" args="0 0 0 0 0.872665 0  base_link base_blue_view 1000" />-->
+    <node pkg="tf" type="static_transform_publisher" name="bv2base_link" args="0 0 0 0 0.872665 0  base_link base_blue_view 1000" />
 </launch>

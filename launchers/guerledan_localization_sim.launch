@@ -27,20 +27,21 @@
         <!--<param name="angle_min" value="6805940"/>
         <param name="angle_max" value="6805940"/>
         <param name="angle_increment" value="6805940"/>-->
+        <param name="blueview_pitch" value="0.872665"/>
         <param name="range_max" value="50"/>
-        <param name="rangeStep" value="0.5"/>
+        <param name="rangeStep" value="0.1"/>
     </node>
 
-    <node pkg="intervalar_localization" type="interval_localization_3D" name="interval_localization_3D" output="screen" >
-            <!-- <remap from="/odom" to="/odom_encoder" /> -->
-            <param name="localizeFPS" value="10" />
+<!--    <node pkg="intervalar_localization" type="interval_localization_3D" name="interval_localization_3D" output="screen" >
+            <!- - <remap from="/odom" to="/odom_encoder" /> - ->
+            <param name="localizeFPS" value="2" />
             <param name="useNreadings" value="40" />
             <param name="thresholdScan" value="0.15" />
             <param name="thresholdOdomOmega" value="0.5" />
             <param name="initialPoseX" value="253539.127054" />
             <param name="initialPoseY" value="6805743.6782" />
             <param name="initialPoseZ" value="122." />
-            <param name="initialPoseTH" value="-0.535816" /> <!-- 0.4886922, 2.0717058-->
+            <param name="initialPoseTH" value="-0.535816" /> <!- - 0.4886922, 2.0717058- ->
             <param name="uncertaintyXY" value="30." />
             <param name="uncertaintyZ" value="5." />
             <param name="uncertaintyTH" value="0.1672665" />
@@ -50,8 +51,9 @@
             <param name="odom_yaw_bounding_ub" value="1." />
             <param name="laserscan_uncertainty" value="0.5" />
             <param name="laserscan_bearing_uncertainty" value="0.09" />
-    </node>
-    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find helius)/config/config.rviz" />
+    </node>-->
+    <!--<node pkg="rviz" type="rviz" name="rviz" args="-d $(find helius)/config/config.rviz" />-->
     <node pkg="tf" type="static_transform_publisher" name="odom2map" args="253539.127054 6805743.6782 0 0 0 0  map odom 1000" />
-    <node pkg="tf" type="static_transform_publisher" name="bv2base_link" args="0 0 0 0 1.5708 0  base_link base_blue_view 1000" />
+    <!--<node pkg="tf" type="static_transform_publisher" name="bv2base_link" args="0 0 0 0 0.872665 0  base_link base_blue_view 1000" />-->
+    <node pkg="tf" type="static_transform_publisher" name="bv2base_link" args="0 0 0 0 0.872665 0  base_link base_blue_view 1000" />
 </launch>

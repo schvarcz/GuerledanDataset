@@ -1,0 +1,29 @@
+<launch>
+
+    <arg name="bagfile" default="/home/schvarcz/Desktop/Guerledan_Datasets/Test_90/2018-04-19-18-29-05.bag" />
+
+    <param name="/use_sim_time" value="true"/>
+<!--    <node pkg="rqt_bag" type="rqt_bag" name="rqt_bag" output="screen" args="$(arg bagfile) - -clock"  />-->
+    <node pkg="rosbag" type="play" name="rosbag" output="screen" args="$(arg bagfile) --rate 10"  />
+
+    <node pkg="intervalar_localization" type="interval_localization_3D" name="interval_localization_3D" output="screen" >
+        <!-- <remap from="/odom" to="/odom_encoder" /> -->
+        <param name="localizeFPS" value="2" />
+        <param name="useNreadings" value="40" />
+        <param name="thresholdScan" value="0.15" />
+        <param name="thresholdOdomOmega" value="0.5" />
+        <param name="initialPoseX" value="253539.127054" />
+        <param name="initialPoseY" value="6805743.6782" />
+        <param name="initialPoseZ" value="122." />
+        <param name="initialPoseTH" value="-0.535816" /> <!-- 0.4886922, 2.0717058-->
+        <param name="uncertaintyXY" value="30." />
+        <param name="uncertaintyZ" value="5." />
+        <param name="uncertaintyTH" value="0.1672665" />
+        <param name="vel_bounding_lb" value="1." />
+        <param name="vel_bounding_ub" value="1." />
+        <param name="odom_yaw_bounding_lb" value="1." />
+        <param name="odom_yaw_bounding_ub" value="1." />
+        <param name="laserscan_uncertainty" value="0.5" />
+        <param name="laserscan_bearing_uncertainty" value="0.09" />
+    </node>
+</launch>
