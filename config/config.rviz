@@ -8,9 +8,8 @@ Panels:
         - /Status1
         - /Odometry1/Shape1
         - /LaserScan1
-        - /TF1
-        - /TF1/Frames1
-        - /TF1/Tree1
+        - /Marker1
+        - /Marker2
       Splitter Ratio: 0.5
     Tree Height: 728
   - Class: rviz/Selection
@@ -215,7 +214,23 @@ Visualization Manager:
       Value: true
     - Class: rviz/Marker
       Enabled: true
-      Marker Topic: /intervalLoc
+      Marker Topic: /vibes
+      Name: Marker
+      Namespaces:
+        "": true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /network
+      Name: Marker
+      Namespaces:
+        "": true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /tail
       Name: Marker
       Namespaces:
         {}
