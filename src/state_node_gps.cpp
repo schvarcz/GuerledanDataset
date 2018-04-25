@@ -50,7 +50,7 @@ class STATEPlayer
 {
 public:
 
-  STATEPlayer () : log_file_path("logstate"), frame_id("odom"), child_frame_id("base_link"), timeDiff(0), firstTime(0), EOFF(false), thresholdDistance(0.5)
+  STATEPlayer () : log_file_path("logstate"), frame_id("odom"), child_frame_id("base_link"), timeDiff(0), firstTime(0), EOFF(false)
   {
     start_time = ros::Time::now();
     last_time = start_time;
@@ -61,7 +61,6 @@ public:
     log_file_path = nodeLocal.param("log_file", log_file_path);
     timeDiff = nodeLocal.param("time_diff", timeDiff);
     firstTime = nodeLocal.param("first_time", firstTime);
-    thresholdDistance = nodeLocal.param("thresholdDistance", thresholdDistance);
 
     std::string ns = ros::this_node::getNamespace();
 
@@ -181,63 +180,17 @@ public:
     log_file.open(log_file_path);
     std::string line;
     std::getline(log_file, line);
-    this->readLine(mLastFilePose);
-    this->readLine(mCurFilePose);
-    this->readLine(mNextFilePose);
+    this->readLine(mLastGpsPose);
+    this->readLine(mCurGpsPose);
 
-    mLastGpsPose = mLastFilePose;
-    mCurGpsPose  = mCurFilePose;
-    mNextGpsPose = mNextFilePose;
-
-
-
-    if (distance(mLastGpsPose, mCurGpsPose) > thresholdDistance)
-      mLastGpsPose.pose.orientation = tf::createQuaternionMsgFromYaw(atan2(mCurGpsPose.pose.position.y - mLastGpsPose.pose.position.y, mCurGpsPose.pose.position.x - mLastGpsPose.pose.position.x));
-
-    if (distance(mCurGpsPose, mNextGpsPose) > thresholdDistance)
-      mCurGpsPose.pose.orientation = tf::createQuaternionMsgFromYaw(atan2(mNextGpsPose.pose.position.y - mCurGpsPose.pose.position.y, mNextGpsPose.pose.position.x - mCurGpsPose.pose.position.x));
-    else
-      mCurGpsPose.pose.orientation = tf::createQuaternionMsgFromYaw( tf::getYaw(mLastGpsPose.pose.orientation) + getDeltaYaw(mLastFilePose, mCurFilePose) );
 //    if (firstTime == 0)
 //      firstTime = mLastGpsPose.header.stamp.toSec() - start_time.toSec();
-  }
-
-  double getDeltaYaw(geometry_msgs::PoseStamped mLastGpsPose, geometry_msgs::PoseStamped mCurGpsPose)
-  {
-      double yaw = tf::getYaw(mCurGpsPose.pose.orientation);
-      double lastYaw = tf::getYaw(mLastGpsPose.pose.orientation);
-      return getDeltaYaw(lastYaw, yaw);
-  }
-
-  double getDeltaYaw(double lastYaw, double yaw)
-  {
-      double omega = yaw-lastYaw;
-      omega = (omega >  M_PI) ? 2*M_PI - omega : omega;
-      omega = (omega < -M_PI) ? omega + 2*M_PI : omega;
-      return omega;
-  }
-
-  double distance(geometry_msgs::PoseStamped mLastGpsPose, geometry_msgs::PoseStamped mCurGpsPose)
-  {
-    return sqrt(pow(mCurGpsPose.pose.position.y - mLastGpsPose.pose.position.y,2) + pow(mCurGpsPose.pose.position.x - mLastGpsPose.pose.position.x,2));
   }
 
   void next()
   {
     mLastGpsPose = mCurGpsPose;
-    mCurGpsPose = mNextGpsPose;
-
-    mLastFilePose = mCurFilePose;
-    mCurFilePose = mNextGpsPose;
-
-    this->readLine(mNextFilePose);
-    mNextGpsPose = mNextFilePose;
-
-    double newYaw = atan2(mNextGpsPose.pose.position.y - mCurGpsPose.pose.position.y, mNextGpsPose.pose.position.x - mCurGpsPose.pose.position.x);
-    if ( (distance(mCurGpsPose, mNextGpsPose) > thresholdDistance) && (fabs(getDeltaYaw(tf::getYaw(mCurGpsPose.pose.orientation), newYaw)) < M_PI/3) )
-      mCurGpsPose.pose.orientation = tf::createQuaternionMsgFromYaw(newYaw);
-    else
-      mCurGpsPose.pose.orientation = tf::createQuaternionMsgFromYaw( tf::getYaw(mLastGpsPose.pose.orientation) + getDeltaYaw(mLastFilePose, mCurFilePose) );
+    this->readLine(mCurGpsPose);
   }
 
   void run()
@@ -268,9 +221,8 @@ private:
   tf::TransformBroadcaster odom_broadcaster;
 
   ros::Time last_time, cur_time, start_time;
-  double timeDiff, firstTime, thresholdDistance;
-  geometry_msgs::PoseStamped mLastGpsPose, mCurGpsPose, mNextGpsPose;
-  geometry_msgs::PoseStamped mLastFilePose, mCurFilePose, mNextFilePose;
+  double timeDiff, firstTime;
+  geometry_msgs::PoseStamped mLastGpsPose, mCurGpsPose;
   std::string log_file_path, frame_id, child_frame_id;
   std::ifstream log_file;
   bool EOFF;
