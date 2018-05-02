@@ -1,6 +1,7 @@
 <launch>
 
-    <arg name="bagfile" default="/home/schvarcz/Desktop/Guerledan_Datasets/Test_90/2018-04-19-18-29-05.bag" />
+    <!--<arg name="bagfile" default="/home/schvarcz/Desktop/Guerledan_Datasets/Test_90/2018-04-19-18-29-05.bag" />-->
+    <arg name="bagfile" default="/home/schvarcz/Desktop/Guerledan_Datasets/Test_90/2018-04-25-18-19-06.bag" />
     <!--<arg name="bagfile" default="/home/schvarcz/Desktop/Guerledan_Datasets/Test_50/2018-04-19-18-56-13.bag" />-->
 
     <param name="/use_sim_time" value="true"/>

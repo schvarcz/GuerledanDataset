@@ -9,16 +9,16 @@
         <param name="initialPoseY" value="6805743.6782" />
         <param name="initialPoseZ" value="122." />
         <param name="initialPoseTH" value="-0.535816" /> <!-- 0.4886922, 2.0717058-->
-        <param name="uncertaintyXY" value="30." />
-        <param name="uncertaintyZ" value="5." />
-        <param name="uncertaintyTH" value="0.1672665" />
+        <param name="uncertaintyXY" value="1." />
+        <param name="uncertaintyZ" value="1." />
+        <param name="uncertaintyTH" value="0" />
         <param name="vel_bounding_lb" value="1." />
         <param name="vel_bounding_ub" value="1." />
         <param name="odom_yaw_bounding_lb" value="1." />
         <param name="odom_yaw_bounding_ub" value="1." />
-        <param name="laserscan_uncertainty" value="0.5" />
-        <param name="laserscan_bearing_uncertainty" value="0.09" />
-        <param name="minNroNodes" value="10" />
+        <param name="laserscan_uncertainty" value="0.05" />
+        <param name="laserscan_bearing_uncertainty" value="0.10472" />
+        <param name="minNroNodes" value="0" />
         <param name="nroLinksTail" value="10" />
         <param name="stepLinksTail" value="2" />
         <!--<param name="blueview_pitch" value="0.872665"/>-->
