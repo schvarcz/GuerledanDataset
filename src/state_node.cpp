@@ -117,6 +117,43 @@ public:
     pose_pub.publish(poseStamped);
   }
 
+  double getDeltaYaw(geometry_msgs::PoseStamped mLastGpsPose, geometry_msgs::PoseStamped mCurGpsPose)
+  {
+      double yaw = tf::getYaw(mCurGpsPose.pose.orientation);
+      double lastYaw = tf::getYaw(mLastGpsPose.pose.orientation);
+      return getDeltaYaw(lastYaw, yaw);
+  }
+
+  double getDeltaYaw(double lastYaw, double yaw)
+  {
+      double omega = yaw-lastYaw;
+      omega = (omega >  M_PI) ? 2*M_PI - omega : omega;
+      omega = (omega < -M_PI) ? omega + 2*M_PI : omega;
+      return omega;
+  }
+
+  double distance(geometry_msgs::PoseStamped mLastGpsPose, geometry_msgs::PoseStamped mCurGpsPose)
+  {
+    return sqrt(pow(mCurGpsPose.pose.position.y - mLastGpsPose.pose.position.y,2) + pow(mCurGpsPose.pose.position.x - mLastGpsPose.pose.position.x,2));
+  }
+
+  double linearVel(geometry_msgs::PoseStamped mLastGpsPose, geometry_msgs::PoseStamped mCurGpsPose)
+  {
+    double dist = distance(mLastGpsPose, mCurGpsPose);
+    double yaw = tf::getYaw(mLastGpsPose.pose.orientation);
+    double a[] = {
+      (mCurGpsPose.pose.position.x - mLastGpsPose.pose.position.x) / dist,
+      (mCurGpsPose.pose.position.y - mLastGpsPose.pose.position.y) / dist,
+    };
+    double b[] = {
+      cos(yaw),
+      sin(yaw),
+    };
+    if (a[0]*b[0]+a[1]*b[1] >= 0)
+      return dist;
+    return -dist;
+  }
+
   void publishOdom()
   {
     double x = mCurGpsPose.pose.position.x;
@@ -130,7 +167,8 @@ public:
     geometry_msgs::Quaternion odom_quat = mCurGpsPose.pose.orientation;
 
     double dt = (cur_time - last_time).toSec();
-    double dx = std::sqrt(std::pow(x - mLastGpsPose.pose.position.x,2) + std::pow(y - mLastGpsPose.pose.position.y,2))/dt;
+    double dx = linearVel(mLastGpsPose, mCurGpsPose)/dt;
+//    dx = std::sqrt(std::pow(x - mLastGpsPose.pose.position.x,2) + std::pow(y - mLastGpsPose.pose.position.y,2))/dt;
     double dy = 0;
 
     double omega = yaw-lastYaw;
@@ -200,26 +238,6 @@ public:
       mCurGpsPose.pose.orientation = tf::createQuaternionMsgFromYaw( tf::getYaw(mLastGpsPose.pose.orientation) + getDeltaYaw(mLastFilePose, mCurFilePose) );
 //    if (firstTime == 0)
 //      firstTime = mLastGpsPose.header.stamp.toSec() - start_time.toSec();
-  }
-
-  double getDeltaYaw(geometry_msgs::PoseStamped mLastGpsPose, geometry_msgs::PoseStamped mCurGpsPose)
-  {
-      double yaw = tf::getYaw(mCurGpsPose.pose.orientation);
-      double lastYaw = tf::getYaw(mLastGpsPose.pose.orientation);
-      return getDeltaYaw(lastYaw, yaw);
-  }
-
-  double getDeltaYaw(double lastYaw, double yaw)
-  {
-      double omega = yaw-lastYaw;
-      omega = (omega >  M_PI) ? 2*M_PI - omega : omega;
-      omega = (omega < -M_PI) ? omega + 2*M_PI : omega;
-      return omega;
-  }
-
-  double distance(geometry_msgs::PoseStamped mLastGpsPose, geometry_msgs::PoseStamped mCurGpsPose)
-  {
-    return sqrt(pow(mCurGpsPose.pose.position.y - mLastGpsPose.pose.position.y,2) + pow(mCurGpsPose.pose.position.x - mLastGpsPose.pose.position.x,2));
   }
 
   void next()
