@@ -168,8 +168,9 @@ public:
 
     double dt = (cur_time - last_time).toSec();
     double dx = linearVel(mLastGpsPose, mCurGpsPose)/dt;
-//    dx = std::sqrt(std::pow(x - mLastGpsPose.pose.position.x,2) + std::pow(y - mLastGpsPose.pose.position.y,2))/dt;
     double dy = 0;
+//    dx = (mCurGpsPose.pose.position.x - mLastGpsPose.pose.position.x)/dt;
+//    dy = (mCurGpsPose.pose.position.y - mLastGpsPose.pose.position.y)/dt;
 
     double omega = yaw-lastYaw;
     omega = (omega >  M_PI) ? 2*M_PI - omega : omega;
@@ -251,11 +252,11 @@ public:
     this->readLine(mNextFilePose);
     mNextGpsPose = mNextFilePose;
 
-    double newYaw = atan2(mNextGpsPose.pose.position.y - mCurGpsPose.pose.position.y, mNextGpsPose.pose.position.x - mCurGpsPose.pose.position.x);
-    if ( (distance(mCurGpsPose, mNextGpsPose) > thresholdDistance) && (fabs(getDeltaYaw(tf::getYaw(mCurGpsPose.pose.orientation), newYaw)) < M_PI/3) )
-      mCurGpsPose.pose.orientation = tf::createQuaternionMsgFromYaw(newYaw);
-    else
-      mCurGpsPose.pose.orientation = tf::createQuaternionMsgFromYaw( tf::getYaw(mLastGpsPose.pose.orientation) + getDeltaYaw(mLastFilePose, mCurFilePose) );
+//    double newYaw = atan2(mNextGpsPose.pose.position.y - mCurGpsPose.pose.position.y, mNextGpsPose.pose.position.x - mCurGpsPose.pose.position.x);
+//    if ( (distance(mCurGpsPose, mNextGpsPose) > thresholdDistance) && (fabs(getDeltaYaw(tf::getYaw(mCurGpsPose.pose.orientation), newYaw)) < M_PI/3) )
+//      mCurGpsPose.pose.orientation = tf::createQuaternionMsgFromYaw(newYaw);
+//    else
+//      mCurGpsPose.pose.orientation = tf::createQuaternionMsgFromYaw( tf::getYaw(mLastGpsPose.pose.orientation) + getDeltaYaw(mLastFilePose, mCurFilePose) );
   }
 
   void run()
