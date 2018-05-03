@@ -6,6 +6,7 @@
         <param name="log_file" value="/home/schvarcz/Dropbox/Doutorado-ENSTA/Guerledan/2017/BUBBLE_WORKSPACE/log/logstate_2017-10-13_10h59min56s_limpo.csv"/>
         <param name="time_diff" value="0"/>
         <param name="first_time" value="0"/>
+        <param name="coefficiente" value="1"/>
     </node>
 
     <node pkg="helius" type="map_node" name="map_node" output="screen">
@@ -16,14 +17,24 @@
         <param name="maxY" value="6805940"/>
     </node>
 
+    <group ns="groundTruth">
+        <node pkg="helius" type="nmea2utm_node" name="nmea2utm_node" output="screen">
+        <param name="log_file" value="/home/schvarcz/Dropbox/Doutorado-ENSTA/Guerledan/gps_converted"/>
+        <param name="frame_id" value="odom_gt"/>
+        <param name="child_frame_id" value="baselink_gt"/>
+    <!--        <param name="time_diff" value="7119"/>
+            <param name="first_time" value="39596"/>-->
+        </node>
+    </group>
+
     <include file="$(find helius)/launchers/simulated_readings.launch" />
     <!--<include file="$(find helius)/launchers/blueview_data.launch" />-->
 
-    <!--<include file="$(find helius)/launchers/guerledan_localization.launch" />-->
+    <include file="$(find helius)/launchers/guerledan_localization.launch" />
 
     <node pkg="rviz" type="rviz" name="rviz" args="-d $(find helius)/config/config.rviz" />
 
+    <node pkg="tf" type="static_transform_publisher" name="odomgt2map" args="0 0 0 0 0 0  map odom_gt 1000" />
     <node pkg="tf" type="static_transform_publisher" name="odom2map" args="253539.127054 6805743.6782 0 0 0 0  map odom 1000" />
-    <!--<node pkg="tf" type="static_transform_publisher" name="bv2base_link" args="0 0 0 0 0.872665 0  base_link base_blue_view 1000" />-->
     <node pkg="tf" type="static_transform_publisher" name="bv2base_link" args="0 0 0 0 $(arg blueview_pitch) 0  base_link base_blue_view 1000" />
 </launch>

@@ -101,7 +101,7 @@ public:
     ptStamped.header.stamp = cur_time;
     ptStamped.point.x = mCurGpsPose.mUtmEast;
     ptStamped.point.y = mCurGpsPose.mUtmNorth;
-    ptStamped.point.z = 124.97; //mCurGpsPose.mAlt;
+    ptStamped.point.z = mCurGpsPose.mAlt;
 
     point_pub.publish(ptStamped);
   }
@@ -113,7 +113,7 @@ public:
     poseStamped.header.stamp = cur_time;
     poseStamped.pose.position.x = mCurGpsPose.mUtmEast;
     poseStamped.pose.position.y = mCurGpsPose.mUtmNorth;
-    poseStamped.pose.position.z = 124.97; //mCurGpsPose.mAlt;
+    poseStamped.pose.position.z = mCurGpsPose.mAlt;
     poseStamped.pose.orientation = tf::createQuaternionMsgFromYaw(std::atan2(mNextGpsPose.mUtmNorth - mCurGpsPose.mUtmNorth, mNextGpsPose.mUtmEast - mCurGpsPose.mUtmEast));
 
     pose_pub.publish(poseStamped);
@@ -123,7 +123,7 @@ public:
   {
     double x = mCurGpsPose.mUtmEast;
     double y = mCurGpsPose.mUtmNorth;
-    double z = 124.97; //mCurGpsPose.mAlt;
+    double z = mCurGpsPose.mAlt;
 
     double yaw = std::atan2(mNextGpsPose.mUtmNorth - mCurGpsPose.mUtmNorth, mNextGpsPose.mUtmEast - mCurGpsPose.mUtmEast);
     double lastYaw = std::atan2(mCurGpsPose.mUtmNorth - mLastGpsPose.mUtmNorth, mCurGpsPose.mUtmEast - mLastGpsPose.mUtmEast);
