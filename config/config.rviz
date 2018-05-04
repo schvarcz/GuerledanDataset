@@ -7,9 +7,11 @@ Panels:
         - /Global Options1
         - /Status1
         - /Odometry1/Shape1
+        - /Pose1
         - /LaserScan1
         - /Marker1
         - /Marker2
+        - /Pose2
       Splitter Ratio: 0.5
     Tree Height: 728
   - Class: rviz/Selection
@@ -90,7 +92,7 @@ Visualization Manager:
           Scale: 1
           Value: true
         Value: true
-      Enabled: true
+      Enabled: false
       Keep: 1000
       Name: Odometry
       Position Tolerance: 0.100000001
@@ -106,13 +108,13 @@ Visualization Manager:
         Value: Arrow
       Topic: /odom
       Unreliable: false
-      Value: true
+      Value: false
     - Alpha: 1
       Axes Length: 1
       Axes Radius: 0.100000001
       Class: rviz/Pose
       Color: 255; 25; 0
-      Enabled: true
+      Enabled: false
       Head Length: 3
       Head Radius: 1
       Name: Pose
@@ -121,7 +123,7 @@ Visualization Manager:
       Shape: Arrow
       Topic: /poseStamped
       Unreliable: false
-      Value: true
+      Value: false
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
@@ -217,7 +219,7 @@ Visualization Manager:
       Marker Topic: /vibes
       Name: Marker
       Namespaces:
-        "": true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -225,7 +227,7 @@ Visualization Manager:
       Marker Topic: /network
       Name: Marker
       Namespaces:
-        "": true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -245,9 +247,13 @@ Visualization Manager:
           Value: true
         base_link:
           Value: true
+        baselink_gt:
+          Value: true
         map:
           Value: true
         odom:
+          Value: true
+        odom_gt:
           Value: true
       Marker Scale: 10
       Name: TF
@@ -260,7 +266,25 @@ Visualization Manager:
             base_link:
               base_blue_view:
                 {}
+          odom_gt:
+            baselink_gt:
+              {}
       Update Interval: 0
+      Value: true
+    - Alpha: 1
+      Axes Length: 1
+      Axes Radius: 0.100000001
+      Class: rviz/Pose
+      Color: 255; 25; 0
+      Enabled: true
+      Head Length: 3
+      Head Radius: 1
+      Name: Pose
+      Shaft Length: 10
+      Shaft Radius: 0.5
+      Shape: Arrow
+      Topic: /groundTruth/poseStamped
+      Unreliable: false
       Value: true
   Enabled: true
   Global Options:
@@ -287,16 +311,16 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 309.030029
+      Distance: 207.001251
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 253444.031
-        Y: 6805753
-        Z: 90.3911896
+        X: 253522.688
+        Y: 6805750
+        Z: 90.310463
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
@@ -305,7 +329,7 @@ Visualization Manager:
       Pitch: 1.56979632
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 6.23172235
+      Yaw: 5.00672007
     Saved: ~
 Window Geometry:
   Displays:
