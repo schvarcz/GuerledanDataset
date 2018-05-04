@@ -4,9 +4,9 @@
 
     <node pkg="helius" type="state_node" name="state_node" output="screen">
         <param name="log_file" value="/home/schvarcz/Dropbox/Doutorado-ENSTA/Guerledan/2017/BUBBLE_WORKSPACE/log/logstate_2017-10-13_10h59min56s_limpo.csv"/>
-        <param name="time_diff" value="0"/>
-        <param name="first_time" value="0"/>
-        <param name="coefficiente" value="1"/>
+        <param name="time_diff" value="39596"/>
+        <param name="first_time" value="39596"/>
+        <param name="coefficiente" value="2"/>
     </node>
 
     <node pkg="helius" type="map_node" name="map_node" output="screen">
@@ -19,11 +19,11 @@
 
     <group ns="groundTruth">
         <node pkg="helius" type="nmea2utm_node" name="nmea2utm_node" output="screen">
-        <param name="log_file" value="/home/schvarcz/Dropbox/Doutorado-ENSTA/Guerledan/gps_converted"/>
-        <param name="frame_id" value="odom_gt"/>
-        <param name="child_frame_id" value="baselink_gt"/>
-    <!--        <param name="time_diff" value="7119"/>
-            <param name="first_time" value="39596"/>-->
+            <param name="log_file" value="/home/schvarcz/Dropbox/Doutorado-ENSTA/Guerledan/2017/BUBBLE_WORKSPACE/log/gps_converted_ublox0_2017-10-13_10h59min56s"/>
+            <param name="frame_id" value="odom_gt"/>
+            <param name="child_frame_id" value="baselink_gt"/>
+            <param name="time_diff" value="7119"/>
+            <param name="first_time" value="39596"/>
         </node>
     </group>
 
