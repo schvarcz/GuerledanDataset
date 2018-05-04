@@ -140,6 +140,8 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(nmea2utm_node src/nmea2utm_node.cpp)
 add_executable(state_node src/state_node.cpp)
+add_executable(state_node_gps src/state_node_gps.cpp)
+add_executable(state_node_mix src/state_node_mix.cpp)
 add_executable(map_node src/map_node.cpp)
 add_executable(simulated_readings_node src/simulated_readings_node.cpp)
 
@@ -159,6 +161,12 @@ target_link_libraries(nmea2utm_node
 )
 
 target_link_libraries(state_node
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(state_node_gps
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(state_node_mix
   ${catkin_LIBRARIES}
 )
 
