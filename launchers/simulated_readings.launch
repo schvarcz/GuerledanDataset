@@ -1,6 +1,7 @@
 <launch>
+    <!--<arg name="blueview_pitch" default="1.5708" />-->
+    <arg name="blueview_pitch" default="0.872665" />
 
-    <arg name="blueview_pitch" default="1.5708" />
     <node pkg="helius" type="simulated_readings_node" name="simulated_readings_node" output="screen">
         <param name="frame_id" value="base_blue_view"/>
         <param name="pixel_size" value="1"/>
