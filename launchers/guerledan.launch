@@ -1,12 +1,12 @@
 <launch>
-
-    <arg name="blueview_pitch" default="1.5708" />
+    <!--<arg name="blueview_pitch" default="1.5708" />-->
+    <arg name="blueview_pitch" default="0.872665" />
 
     <node pkg="helius" type="state_node" name="state_node" output="screen">
         <param name="log_file" value="/home/schvarcz/Dropbox/Doutorado-ENSTA/Guerledan/2017/BUBBLE_WORKSPACE/log/logstate_2017-10-13_10h59min56s_limpo.csv"/>
         <param name="time_diff" value="39596"/>
         <param name="first_time" value="39596"/>
-        <param name="coefficiente" value="2"/>
+        <param name="coefficiente" value="1.9"/>
     </node>
 
     <node pkg="helius" type="map_node" name="map_node" output="screen">
@@ -18,23 +18,44 @@
     </node>
 
     <group ns="groundTruth">
-        <node pkg="helius" type="nmea2utm_node" name="nmea2utm_node" output="screen">
-            <param name="log_file" value="/home/schvarcz/Dropbox/Doutorado-ENSTA/Guerledan/2017/BUBBLE_WORKSPACE/log/gps_converted_ublox0_2017-10-13_10h59min56s"/>
+<!--        <node pkg="helius" type="state_node_gps" name="state_node_gps" output="screen">
             <param name="frame_id" value="odom_gt"/>
             <param name="child_frame_id" value="baselink_gt"/>
+            <param name="log_file" value="/home/schvarcz/Dropbox/Doutorado-ENSTA/Guerledan/2017/BUBBLE_WORKSPACE/log/logstate_2017-10-13_10h59min56s_limpo.csv"/>
+            <param name="time_diff" value="39596"/>
+            <param name="first_time" value="39596"/>
+        </node>-->
+
+        <node pkg="helius" type="state_node" name="state_node_gt" output="screen">
+            <param name="log_file" value="/home/schvarcz/Dropbox/Doutorado-ENSTA/Guerledan/2017/BUBBLE_WORKSPACE/log/logstate_2017-10-13_10h59min56s_limpo.csv"/>
+            <param name="frame_id" value="odom_gt"/>
+            <param name="child_frame_id" value="baselink_gt"/>
+            <param name="time_diff" value="39596"/>
+            <param name="first_time" value="39596"/>
+            <param name="coefficiente" value="1.9"/>
+        </node>
+    </group>
+
+    <group ns="gpsRTK">
+        <node pkg="helius" type="nmea2utm_node" name="nmea2utm_node" output="screen">
+            <param name="log_file" value="/home/schvarcz/Dropbox/Doutorado-ENSTA/Guerledan/2017/BUBBLE_WORKSPACE/log/gps_converted_ublox0_2017-10-13_10h59min56s"/>
+            <param name="frame_id" value="odom_rtk"/>
+            <param name="child_frame_id" value="baselink_rtk"/>
             <param name="time_diff" value="7119"/>
             <param name="first_time" value="39596"/>
         </node>
     </group>
 
     <include file="$(find helius)/launchers/simulated_readings.launch" />
+
     <!--<include file="$(find helius)/launchers/blueview_data.launch" />-->
 
-    <include file="$(find helius)/launchers/guerledan_localization.launch" />
+    <!--<include file="$(find helius)/launchers/guerledan_localization.launch" />-->
 
-    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find helius)/config/config.rviz" />
+    <!--<node pkg="rviz" type="rviz" name="rviz" args="-d $(find helius)/config/config.rviz" />-->
 
-    <node pkg="tf" type="static_transform_publisher" name="odomgt2map" args="0 0 0 0 0 0  map odom_gt 1000" />
+    <!--<node pkg="tf" type="static_transform_publisher" name="odomgt2map" args="0 0 0 0 0 0  map odom_gt 1000" />-->
+    <node pkg="tf" type="static_transform_publisher" name="odomgt2map" args="253539.127054 6805743.6782 0 0 0 0  map odom_gt 1000" />
     <node pkg="tf" type="static_transform_publisher" name="odom2map" args="253539.127054 6805743.6782 0 0 0 0  map odom 1000" />
-    <node pkg="tf" type="static_transform_publisher" name="bv2base_link" args="0 0 0 0 $(arg blueview_pitch) 0  base_link base_blue_view 1000" />
+    <node pkg="tf" type="static_transform_publisher" name="bv2base_link_gt" args="0 0 0 0 $(arg blueview_pitch) 0  baselink_gt base_blue_view 1000" />
 </launch>
