@@ -46,7 +46,7 @@ public:
 
     std::string ns = ros::this_node::getNamespace();
 
-    sub1 = n.subscribe("/poseStamped", 1, &SimuReadings::poseCallback, this);
+    sub1 = n.subscribe("/groundTruth/poseStamped", 1, &SimuReadings::poseCallback, this);
     scan_pub = n.advertise<sensor_msgs::LaserScan>(ns+"/scan", 50);
     laser_msg.header.frame_id = frame_id;
 
