@@ -1,10 +1,6 @@
 <launch>
-
-    <!--<arg name="bagfile" default="/home/schvarcz/Desktop/Guerledan_Datasets/Test_90/2018-04-19-18-29-05.bag" />-->
-    <!--<arg name="bagfile" default="/home/schvarcz/Desktop/Guerledan_Datasets/Test_90/2018-04-25-18-19-06.bag" />-->
-    <!--<arg name="bagfile" default="/home/schvarcz/Desktop/Guerledan_Datasets/Test_50/2018-04-19-18-56-13.bag" />-->
-    <!--<arg name="bagfile" default="/home/schvarcz/Desktop/Guerledan_Datasets/Test_90/2018-05-02-14-53-58.bag" />-->
-    <arg name="bagfile" default="/home/schvarcz/Desktop/Guerledan_Datasets/Test_90/2018-05-02-17-55-03.bag" />
+    <arg name="bagfile" default="/home/schvarcz/Desktop/Guerledan_Datasets/Test_90/2018-05-04-15-22-51.bag" />
+<!--    <arg name="bagfile" default="/home/schvarcz/Desktop/Guerledan_Datasets/Test_50/2018-05-28-15-55-44.bag" />-->
 
     <param name="/use_sim_time" value="true"/>
 <!--    <node pkg="rqt_bag" type="rqt_bag" name="rqt_bag" output="screen" args="$(arg bagfile) - -clock"  />-->
