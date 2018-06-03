@@ -11,7 +11,7 @@
         <param name="initialPoseTH" value="-0.511381" /> <!-- 0.4886922, 2.0717058-->
         <param name="uncertaintyXY" value="1.0" />
         <param name="uncertaintyZ" value="1.0" />
-        <param name="uncertaintyTH" value="0.0" /> <!-- 0.174533 -->
+        <param name="uncertaintyTH" value="0.1" /> <!-- 0.174533 -->
         <param name="vel_bounding_lb" value="1" />
         <param name="vel_bounding_ub" value="1" />
         <param name="odom_yaw_bounding_lb" value="1" />

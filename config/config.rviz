@@ -9,10 +9,10 @@ Panels:
         - /Odometry1/Shape1
         - /Pose1
         - /LaserScan1
-        - /Marker1
-        - /Marker2
         - /Pose2
         - /PointStamped3
+        - /PointCloud3
+        - /PointCloud3/Status1
       Splitter Ratio: 0.5
     Tree Height: 728
   - Class: rviz/Selection
@@ -216,29 +216,29 @@ Visualization Manager:
       Use rainbow: true
       Value: true
     - Class: rviz/Marker
-      Enabled: true
+      Enabled: false
       Marker Topic: /vibes
       Name: Marker
       Namespaces:
         {}
       Queue Size: 100
-      Value: true
+      Value: false
     - Class: rviz/Marker
-      Enabled: true
+      Enabled: false
       Marker Topic: /network
       Name: Marker
       Namespaces:
         {}
       Queue Size: 100
-      Value: true
+      Value: false
     - Class: rviz/Marker
-      Enabled: true
+      Enabled: false
       Marker Topic: /tail
       Name: Marker
       Namespaces:
         {}
       Queue Size: 100
-      Value: true
+      Value: false
     - Class: rviz/TF
       Enabled: true
       Frame Timeout: 15
@@ -247,8 +247,6 @@ Visualization Manager:
         base_blue_view:
           Value: true
         base_link:
-          Value: true
-        baselink_gt:
           Value: true
         map:
           Value: true
@@ -265,11 +263,10 @@ Visualization Manager:
         map:
           odom:
             base_link:
-              {}
-          odom_gt:
-            baselink_gt:
               base_blue_view:
                 {}
+          odom_gt:
+            {}
       Update Interval: 0
       Value: true
     - Alpha: 1
@@ -296,6 +293,44 @@ Visualization Manager:
       Radius: 5
       Topic: /groundTruth/pointStamped
       Unreliable: false
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /intervalLoc
+      Name: Marker
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 122
+        Min Value: 122
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz/PointCloud
+      Color: 255; 255; 255
+      Color Transformer: AxisColor
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 0; 255; 255
+      Max Intensity: 4096
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: PointCloud
+      Position Transformer: XYZ
+      Queue Size: 10
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 1
+      Style: Boxes
+      Topic: /scannn
+      Unreliable: false
+      Use Fixed Frame: true
+      Use rainbow: true
       Value: true
   Enabled: true
   Global Options:
@@ -329,9 +364,9 @@ Visualization Manager:
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 253455.891
-        Y: 6805743
-        Z: 90.3297424
+        X: 253518.328
+        Y: 6805744
+        Z: 90.3076096
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
@@ -340,7 +375,7 @@ Visualization Manager:
       Pitch: 1.56979632
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 5.00672007
+      Yaw: 5.27672577
     Saved: ~
 Window Geometry:
   Displays:
